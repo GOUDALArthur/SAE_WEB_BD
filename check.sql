@@ -7,12 +7,51 @@ begin
   return res;
 end|
 
-create or replace function finDerniereEvenement(idGroupe int, heure datetime) returns datetime
+create or replace function finDernierEvenement(idGroupe int, heure datetime) returns datetime
 begin
-    declare dernierConcert datetime;
-    declare derniereActAnn datetime;
-    SELECT dateConcert into dernierConcert FROM CONCERT WHERE idGr = idGroupe ORDER BY dateConcert LIMIT 1;
-    SELECT dureeActAnn into derniereActAnn FROM ACTIVITE_ANNEXE NATURAL JOIN PARTICIPER 
+    declare dernierConcert int;
+    declare dateDernierConcert datetime;
+    declare dureeDernierConcert int;
+    declare derniereActAnn int;
+    declare dateDerniereActAnn datetime;
+    declare dureeDerniereActAnn int;
+
+    SELECT idConcert, dateConcert into dernierConcert, dateDernierConcert FROM CONCERT WHERE idGr = idGroupe AND dateConcert > heure ORDER BY dateConcert LIMIT 1;
+    SELECT idActAnn, dateActAnn into derniereActAnn, dateDerniereActAnn FROM ACTIVITE_ANNEXE NATURAL JOIN PARTICIPER WHERE idGr = idGroupe AND dateActAnn > heure ORDER BY dureeActAnn LIMIT 1;
+    if dateDernierConcert < dateDerniereActAnn then
+        SELECT dureeConcert into dureeDernierConcert FROM CONCERT WHERE idConcert = dernierConcert;
+        set dateDernierConcert = ADDDATE(dateDernierConcert, INTERVAL dureeDernierConcert MINUTE);
+        return dateDernierConcert;
+    elseif dateDerniereActAnn < dateDernierConcert then
+        SELECT dureeActAnn into dureeDerniereActAnn FROM ACTIVITE_ANNEXE WHERE idActAnn = derniereActAnn;
+        set dateDerniereActAnn = ADDDATE(dateDerniereActAnn, INTERVAL dureeDerniereActAnn MINUTE);
+        return dateDerniereActAnn;
+    end if;
+    return null;
+end|
+
+create or replace function debutProchainEvenement(idGroupe int, heure datetime) returns datetime
+begin
+    declare prochainConcert int;
+    declare dateProchainConcert datetime;
+    declare dureeProchainConcert int;
+    declare prochaineActAnn int;
+    declare dateProchaineActAnn datetime;
+    declare dureeProchaineActAnn int;
+
+    SELECT idConcert, dateConcert into prochainConcert, dateProchainConcert FROM CONCERT WHERE idGr = idGroupe AND dateConcert < heure ORDER BY dateConcert DESC LIMIT 1;
+    SELECT idActAnn, dateActAnn into prochaineActAnn, dateProchaineActAnn FROM ACTIVITE_ANNEXE NATURAL JOIN PARTICIPER WHERE idGr = idGroupe AND dateActAnn < heure ORDER BY dureeActAnn LIMIT 1;
+    if dateProchainConcert < dateProchaineActAnn then
+        SELECT dureeConcert into dureeProchainConcert FROM CONCERT WHERE idConcert = dernierConcert;
+        set dateProchainConcert = ADDDATE(dateProchainConcert, INTERVAL dureeProchainConcert MINUTE);
+        return dateProchainConcert;
+    elseif dateProchaineActAnn < dateProchainConcert then
+        SELECT dureeActAnn into dureeProchaineActAnn FROM ACTIVITE_ANNEXE WHERE idActAnn = derniereActAnn;
+        set dateProchaineActAnn = ADDDATE(dateProchaineActAnn, INTERVAL dureeProchaineActAnn MINUTE);
+        return dateProchaineActAnn;
+    end if;
+    return null;
+end|
 
 create or replace trigger dureeBilletValide before insert on RESERVER for each row
 begin
