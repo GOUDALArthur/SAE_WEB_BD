@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS INSTRUMENT;
 DROP TABLE IF EXISTS ARTISTE;
 DROP TABLE IF EXISTS OCCUPER;
 DROP TABLE IF EXISTS HEBERGEMENT;
-DROP TABLE IF EXISTS EFFECTUER;
+DROP TABLE IF EXISTS PARTICIPER;
 DROP TABLE IF EXISTS ACTIVITE_ANNEXE;
 DROP TABLE IF EXISTS TYPE_ACTIVITE_ANNEXE;
 DROP TABLE IF EXISTS RESERVER;
@@ -22,8 +22,8 @@ DROP TABLE IF EXISTS TYPE_MUSIQUE;
 CREATE TABLE ACTIVITE_ANNEXE (
   idActAnn int,
   descriptionActAnn VARCHAR(500),
-  dateActAnn date NOT NULL,
-  dureeActAnn float(2,1) NOT NULL,
+  dateActAnn datetime NOT NULL,
+  dureeActAnn int NOT NULL,
   idTypeActAnn int NOT NULL,
   idLieu int NOT NULL,
   constraint PK_ACTIVITE_ANNEXE PRIMARY KEY (idActAnn),
@@ -39,15 +39,15 @@ CREATE TABLE ARTISTE (
 
 CREATE TABLE BILLET (
   idBil int,
-  dureeValBil float(3,1) NOT NULL,
+  dureeValBil int NOT NULL,
   idFest int NOT NULL,
   constraint PK_BILLET PRIMARY KEY (idBil)
 );
 
-CREATE TABLE EFFECTUER (
+CREATE TABLE PARTICIPER (
   idGr int,
   idActAnn int,
-  constraint PK_EFFECTUER PRIMARY KEY (idGr, idActAnn)
+  constraint PK_PARTICIPER PRIMARY KEY (idGr, idActAnn)
 );
 
 CREATE TABLE FAVORISER_GROUPE (
@@ -118,10 +118,10 @@ CREATE TABLE OCCUPER (
 
 CREATE TABLE CONCERT (
   idConcert int,
-  dateConcert date NOT NULL,
-  dureeConcert float(2,1) NOT NULL,
-  dureeMontage float(2,1) NOT NULL,
-  dureeDemontage float(2,1) NOT NULL,
+  dateConcert datetime NOT NULL,
+  dureeConcert int NOT NULL,
+  dureeMontage int NOT NULL,
+  dureeDemontage int NOT NULL,
   idGr int NOT NULL,
   idLieu int NOT NULL,
   constraint PK_CONCERT PRIMARY KEY (idConcert),
@@ -135,7 +135,6 @@ CREATE TABLE RESERVER (
   idConcert int,
   idBil int,
   constraint PK_RESERVER PRIMARY KEY (idConcert, idBil)
-  -- constraint BILLET_VALIDE CHECK (getDureeBilletRestante(idBil) > idBil)
 );
 
 CREATE TABLE STYLE_MUSIQUE (
@@ -161,8 +160,8 @@ ALTER TABLE ACTIVITE_ANNEXE ADD FOREIGN KEY (idLieu) REFERENCES LIEUX (idLieu);
 ALTER TABLE ACTIVITE_ANNEXE ADD FOREIGN KEY (idTypeActAnn) REFERENCES TYPE_ACTIVITE_ANNEXE (idTypeActAnn);
 ALTER TABLE ARTISTE ADD FOREIGN KEY (idGr) REFERENCES GROUPE (idGr);
 ALTER TABLE BILLET ADD FOREIGN KEY (idFest) REFERENCES FESTIVALIER (idFest);
-ALTER TABLE EFFECTUER ADD FOREIGN KEY (idActAnn) REFERENCES ACTIVITE_ANNEXE (idActAnn);
-ALTER TABLE EFFECTUER ADD FOREIGN KEY (idGr) REFERENCES GROUPE (idGr);
+ALTER TABLE PARTICIPER ADD FOREIGN KEY (idActAnn) REFERENCES ACTIVITE_ANNEXE (idActAnn);
+ALTER TABLE PARTICIPER ADD FOREIGN KEY (idGr) REFERENCES GROUPE (idGr);
 ALTER TABLE FAVORISER_GROUPE ADD FOREIGN KEY (idGr) REFERENCES GROUPE (idGr);
 ALTER TABLE FAVORISER_GROUPE ADD FOREIGN KEY (idFest) REFERENCES FESTIVALIER (idFest);
 ALTER TABLE FAVORISER_STYLE ADD FOREIGN KEY (idStyle) REFERENCES STYLE_MUSIQUE (idStyle);
@@ -178,29 +177,3 @@ ALTER TABLE CONCERT ADD FOREIGN KEY (idGr) REFERENCES GROUPE (idGr);
 ALTER TABLE RESERVER ADD FOREIGN KEY (idBil) REFERENCES BILLET (idBil);
 ALTER TABLE RESERVER ADD FOREIGN KEY (idConcert) REFERENCES CONCERT (idConcert);
 ALTER TABLE STYLE_MUSIQUE ADD FOREIGN KEY (idType) REFERENCES TYPE_MUSIQUE (idType);
-
-
-DELIMITER |
-
-create or replace trigger compareDureeBillet before insert on RESERVER for each row
-begin
-  declare dureeReservee float;
-  declare dureeBillet float;
-  declare dureeRestante float;
-  declare dureeC float;
-  declare mes varchar(100);
-  SELECT SUM(dureeConcert) into dureeReservee FROM CONCERT NATURAL JOIN RESERVER WHERE idBil = new.idBil;
-  SELECT dureeValBil into dureeBillet FROM BILLET WHERE idBil = new.idBil;
-  set dureeRestante = dureeBillet - dureeReservee;
-  if dureeRestante <= 0 then
-    set mes = concat('Réservation impossible billet ', new.idBil, ': Billet déjà consommé');
-    signal SQLSTATE '45000' set MESSAGE_TEXT = mes;
-  end if;
-  SELECT dureeConcert into dureeC FROM CONCERT WHERE idConcert = new.idConcert;
-  if dureeRestante < dureeC then
-    set mes = concat('Réservation impossible billet ', new.idBil, ': Concert trop long pour la validité restante du billet');
-    signal SQLSTATE '45000' set MESSAGE_TEXT = mes;
-  end if;
-end|
-
-DELIMITER ;
