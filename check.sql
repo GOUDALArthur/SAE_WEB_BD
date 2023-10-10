@@ -163,4 +163,41 @@ begin
   end if;
 end|
 
+
+create or replace trigger groupeDisponibleActivite before insert on PARTICIPER for each row
+begin
+  declare lieuAct int;
+  declare dateAct datetime;
+  declare dureeAct int;
+  declare dernierEvenement datetime;
+  declare prochainEvenement datetime;
+  declare provenance int;
+  declare destination int;
+  declare dernierTempsTrajet int;
+  declare prochainTempsTrajet int;
+  declare mes varchar(100);
+
+  SELECT dateActAnn, dureeActAnn, idLieu into dateAct, dureeAct, lieuAct FROM ACTIVITE_ANNEXE WHERE idActAnn = new.idActAnn;
+
+  set dernierEvenement = finDernierEvenementGroupe(new.idGr);
+  set provenance = getIdentifiantLieu(new.idGr, dernierEvenement, 'D');
+  SELECT tempsDeTrajet into dernierTempsTrajet FROM DEPLACER WHERE (idLieuDepart = provenance AND idLieuArrivee = lieuAct) OR (idLieuDepart = lieuAct AND idLieuArrivee = provenance);
+  if dernierEvenement is not null then
+    if ADDDATE(dernierEvenement, INTERVAL dernierTempsTrajet MINUTE) < dateAct then
+      set mes = concat('Insertion participation du groupe ', new.idGr, " à l'activité ", new.idActAnn, ' impossible : date trop proche du dernier évènement du groupe');
+      signal SQLSTATE '45000' set MESSAGE_TEXT = mes;
+    end if;
+  end if;
+
+  set prochainEvenement = debutProchainEvenementGroupe(new.idGr);
+  set destination = getIdentifiantLieu(new.idGr, prochainEvenement, 'P');
+  SELECT tempsDeTrajet into prochainTempsTrajet FROM DEPLACER WHERE (idLieuDepart = destination AND idLieuArrivee = lieuAct) OR (idLieuDepart = lieuAct AND idLieuArrivee = destination);
+  if prochainEvenement is not null then
+    if ADDDATE(ADDDATE(dateAct, INTERVAL dureeAct MINUTE), INTERVAL prochainTempsTrajet MINUTE) < prochainEvenement then
+      set mes = concat('Insertion participation du groupe ', new.idGr, " à l'activité ", new.idActAnn, ' impossible : date trop proche du prochain évènement du groupe');
+      signal SQLSTATE '45000' set MESSAGE_TEXT = mes;
+    end if;
+  end if;
+end|
+
 DELIMITER ;
