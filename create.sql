@@ -110,7 +110,6 @@ CREATE TABLE LIEUX (
   idLieu int,
   lieu VARCHAR(500) NOT NULL,
   capaciteLieu int NOT NULL,
-  photosLieu VARCHAR(42),
   constraint PK_LIEUX PRIMARY KEY (idLieu),
   constraint CAPACITE_LIEU_POSITIVE CHECK (capaciteLieu > 0)
 );
