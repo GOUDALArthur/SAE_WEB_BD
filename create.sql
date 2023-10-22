@@ -138,6 +138,7 @@ CREATE TABLE CONCERT (
   idLieu int NOT NULL,
   constraint PK_CONCERT PRIMARY KEY (idConcert),
   constraint DUREE_DEMONTAGE_POSITIVE CHECK (dureeDemontage > 0),
+  constraint DUREE_MONTAGE_POSITIVE CHECK (dureeMontage > 0),
   constraint CONCERT_APRES_14H CHECK (TIME(dateDebutConcert) >= STR_TO_DATE('14:00:00', '%H:%i:%s'))
   -- constraint CONCERT_AVANT_4H CHECK (TIME(dateDebutConcert + dateFinConcert) <= STR_TO_DATE('04:00:00', '%H:%i:%s'))
 );
