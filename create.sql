@@ -13,6 +13,7 @@ DROP TABLE IF EXISTS DEPLACER;
 DROP TABLE IF EXISTS LIEUX;
 DROP TABLE IF EXISTS FAVORISER_STYLE;
 DROP TABLE IF EXISTS FAVORISER_GROUPE;
+DROP TABLE IF EXISTS PHOTO;
 DROP TABLE IF EXISTS GROUPE;
 DROP TABLE IF EXISTS FESTIVALIER;
 DROP TABLE IF EXISTS STYLE_MUSIQUE;
@@ -23,12 +24,11 @@ DROP TABLE IF EXISTS TYPE_MUSIQUE;
 CREATE TABLE ACTIVITE_ANNEXE (
   idActAnn int,
   descriptionActAnn VARCHAR(500),
-  dateActAnn datetime NOT NULL,
-  dureeActAnn int NOT NULL,
+  dateDebutActAnn datetime NOT NULL,
+  dateFinActAnn datetime NOT NULL,
   idTypeActAnn int NOT NULL,
   idLieu int NOT NULL,
-  constraint PK_ACTIVITE_ANNEXE PRIMARY KEY (idActAnn),
-  constraint TIME_ACTIVITE_ANNEXE CHECK (dureeActAnn > 0)
+  constraint PK_ACTIVITE_ANNEXE PRIMARY KEY (idActAnn)
 );
 
 CREATE TABLE ARTISTE (
@@ -41,7 +41,7 @@ CREATE TABLE ARTISTE (
 CREATE TABLE BILLET (
   idBil int,
   dureeValBil int NOT NULL,
-  idFest int NOT NULL,
+  idProprietaire int NOT NULL,
   constraint PK_BILLET PRIMARY KEY (idBil)
 );
 
@@ -65,16 +65,22 @@ CREATE TABLE FAVORISER_STYLE (
 
 CREATE TABLE FESTIVALIER (
   idFest int,
-  prenomFest varchar(20),
+  prenomFest varchar(20) NOT NULL,
   nomFest varchar(50) NOT NULL,
   constraint PK_FESTIVALIER PRIMARY KEY (idFest)
+);
+
+CREATE TABLE PHOTO (
+  idPhoto int,
+  idGr int,
+  photo blob,
+  constraint PK_PHOTO PRIMARY KEY (idPhoto)
 );
 
 CREATE TABLE GROUPE (
   idGr int,
   nomGr VARCHAR(500) NOT NULL,
   descriptionGr VARCHAR(500),
-  photosGr VARCHAR(42),
   reseauxGr VARCHAR(500),
   idStyle int NOT NULL,
   constraint PK_GROUPE PRIMARY KEY (idGr)
@@ -85,7 +91,7 @@ CREATE TABLE HEBERGEMENT (
   libelleHeberg varchar(50) NOT NULL,
   capaciteHeberg int NOT NULL,
   constraint PK_HEBERGEMENT PRIMARY KEY (idHeberg),
-  constraint CAPACITE_HEBERGEMENT CHECK (capaciteHeberg > 0)
+  constraint CAPACITE_HEBERGEMENT_POSITIVE CHECK (capaciteHeberg > 0)
 );
 
 CREATE TABLE INSTRUMENT (
@@ -106,7 +112,7 @@ CREATE TABLE LIEUX (
   capaciteLieu int NOT NULL,
   photosLieu VARCHAR(42),
   constraint PK_LIEUX PRIMARY KEY (idLieu),
-  constraint CAPACITE_LIEU CHECK (capaciteLieu > 0)
+  constraint CAPACITE_LIEU_POSITIVE CHECK (capaciteLieu > 0)
 );
 
 CREATE TABLE DEPLACER (
@@ -125,16 +131,16 @@ CREATE TABLE OCCUPER (
 
 CREATE TABLE CONCERT (
   idConcert int,
-  dateConcert datetime NOT NULL,
-  dureeConcert int NOT NULL,
+  dateDebutConcert datetime NOT NULL,
+  dateFinConcert datetime NOT NULL,
   dureeMontage int NOT NULL,
   dureeDemontage int NOT NULL,
   idGr int NOT NULL,
   idLieu int NOT NULL,
   constraint PK_CONCERT PRIMARY KEY (idConcert),
-  constraint DUREE_CONCERT CHECK (dureeConcert > 0),
-  constraint DUREE_MONTAGE CHECK (dureeMontage > 0),
-  constraint DUREE_DEMONTAGE CHECK (dureeDemontage > 0)
+  constraint DUREE_DEMONTAGE_POSITIVE CHECK (dureeDemontage > 0),
+  constraint CONCERT_APRES_14H CHECK (TIME(dateDebutConcert) >= STR_TO_DATE('14:00:00', '%H:%i:%s'))
+  -- constraint CONCERT_AVANT_4H CHECK (TIME(dateDebutConcert + dateFinConcert) <= STR_TO_DATE('04:00:00', '%H:%i:%s'))
 );
 
 CREATE TABLE RESERVER (
@@ -165,7 +171,7 @@ CREATE TABLE TYPE_MUSIQUE (
 ALTER TABLE ACTIVITE_ANNEXE ADD FOREIGN KEY (idLieu) REFERENCES LIEUX (idLieu);
 ALTER TABLE ACTIVITE_ANNEXE ADD FOREIGN KEY (idTypeActAnn) REFERENCES TYPE_ACTIVITE_ANNEXE (idTypeActAnn);
 ALTER TABLE ARTISTE ADD FOREIGN KEY (idGr) REFERENCES GROUPE (idGr);
-ALTER TABLE BILLET ADD FOREIGN KEY (idFest) REFERENCES FESTIVALIER (idFest);
+ALTER TABLE BILLET ADD FOREIGN KEY (idProprietaire) REFERENCES FESTIVALIER (idFest);
 ALTER TABLE PARTICIPER ADD FOREIGN KEY (idActAnn) REFERENCES ACTIVITE_ANNEXE (idActAnn);
 ALTER TABLE PARTICIPER ADD FOREIGN KEY (idGr) REFERENCES GROUPE (idGr);
 ALTER TABLE FAVORISER_GROUPE ADD FOREIGN KEY (idGr) REFERENCES GROUPE (idGr);
@@ -184,3 +190,4 @@ ALTER TABLE RESERVER ADD FOREIGN KEY (idConcert) REFERENCES CONCERT (idConcert);
 ALTER TABLE STYLE_MUSIQUE ADD FOREIGN KEY (idType) REFERENCES TYPE_MUSIQUE (idType);
 ALTER TABLE DEPLACER ADD FOREIGN KEY (idLieuDepart) REFERENCES LIEUX (idLieu);
 ALTER TABLE DEPLACER ADD FOREIGN KEY (idLieuArrivee) REFERENCES LIEUX (idLieu);
+ALTER TABLE PHOTO ADD FOREIGN KEY (idGr) REFERENCES GROUPE (idGr);
