@@ -47,7 +47,7 @@ begin
   declare dateDerniereActAnn datetime;
 
   SELECT dateFinConcert, dureeDemontage into dateDernierConcert, demontage FROM CONCERT NATURAL JOIN LIEUX WHERE idLieu = idL AND dateDebutConcert > heure ORDER BY dateDebutConcert LIMIT 1;
-  SELECT dateFinActAnn into derniereActAnn, dateDerniereActAnn FROM ACTIVITE_ANNEXE NATURAL JOIN LIEUX WHERE idLieu = idL AND dateActAnn > heure ORDER BY dureeActAnn LIMIT 1;
+  SELECT dateFinActAnn into dateDerniereActAnn FROM ACTIVITE_ANNEXE NATURAL JOIN LIEUX WHERE idLieu = idL AND dateActAnn > heure ORDER BY dureeActAnn LIMIT 1;
   if dateDernierConcert < dateDerniereActAnn then
     set dateDernierConcert = ADDDATE(dateDernierConcert, INTERVAL demontage MINUTE);
     return dateDernierConcert;
@@ -192,7 +192,8 @@ end|
 create or replace trigger groupeDisponibleActivite before insert on PARTICIPER for each row
 begin
   declare lieuAct int;
-  declare dateAct datetime;
+  declare dateDebutAct datetime;
+  declare dateFinAct datetime;
   declare dernierEvenement datetime;
   declare prochainEvenement datetime;
   declare provenance int;
@@ -201,23 +202,23 @@ begin
   declare prochainTempsTrajet int;
   declare mes varchar(100);
 
-  SELECT dateActAnn, idLieu into dateAct, lieuAct FROM ACTIVITE_ANNEXE WHERE idActAnn = new.idActAnn;
+  SELECT dateDebutActAnn, dateFinActAnn, idLieu into dateDebutAct, dateFinAct, lieuAct FROM ACTIVITE_ANNEXE WHERE idActAnn = new.idActAnn;
 
-  set dernierEvenement = finDernierEvenementGroupe(new.idGr, dateAct);
+  set dernierEvenement = finDernierEvenementGroupe(new.idGr, dateDebutAct);
   set provenance = getIdentifiantLieu(new.idGr, dernierEvenement, 'D');
   if dernierEvenement is not null then
     SELECT tempsDeTrajet into dernierTempsTrajet FROM DEPLACER WHERE (idLieuDepart = provenance AND idLieuArrivee = lieuAct) OR (idLieuDepart = lieuAct AND idLieuArrivee = provenance);
-    if ADDDATE(dernierEvenement, INTERVAL dernierTempsTrajet MINUTE) < dateAct then
+    if ADDDATE(dernierEvenement, INTERVAL dernierTempsTrajet MINUTE) < dateDebutAct then
       set mes = concat('Insertion participation du groupe ', new.idGr, " à l'activité ", new.idActAnn, ' impossible : date trop proche du dernier évènement du groupe');
       signal SQLSTATE '45000' set MESSAGE_TEXT = mes;
     end if;
   end if;
 
-  set prochainEvenement = debutProchainEvenementGroupe(new.idGr);
+  set prochainEvenement = debutProchainEvenementGroupe(new.idGr, dateDebutAct);
   set destination = getIdentifiantLieu(new.idGr, prochainEvenement, 'P');
   SELECT tempsDeTrajet into prochainTempsTrajet FROM DEPLACER WHERE (idLieuDepart = destination AND idLieuArrivee = lieuAct) OR (idLieuDepart = lieuAct AND idLieuArrivee = destination);
   if prochainEvenement is not null then
-    if ADDDATE(ADDDATE(dateAct, INTERVAL dureeAct MINUTE), INTERVAL prochainTempsTrajet MINUTE) < prochainEvenement then
+    if ADDDATE(dateFinAct, INTERVAL prochainTempsTrajet MINUTE) < prochainEvenement then
       set mes = concat('Insertion participation du groupe ', new.idGr, " à l'activité ", new.idActAnn, ' impossible : date trop proche du prochain évènement du groupe');
       signal SQLSTATE '45000' set MESSAGE_TEXT = mes;
     end if;
@@ -227,6 +228,7 @@ end|
 
 create or replace trigger lieuDisponibleConcert before insert on CONCERT for each row
 begin
+  declare lieu int;
   declare dernierEvenement datetime;
   declare prochainEvenement datetime;
   declare dernierTempsTrajet int;
@@ -247,7 +249,7 @@ begin
   set lieu = getIdentifiantLieu(new.idGr, prochainEvenement, 'P');
   SELECT tempsDeTrajet into prochainTempsTrajet FROM DEPLACER WHERE (idLieuDepart = lieu AND idLieuArrivee = new.idLieu) OR (idLieuDepart = new.idLieu AND idLieuArrivee = lieu);
   if prochainEvenement is not null then
-    if ADDDATE(ADDDATE(new.dateDebutConcert, INTERVAL new.dureeConcert MINUTE), INTERVAL prochainTempsTrajet MINUTE) < prochainEvenement then
+    if ADDDATE(new.dateFinConcert, INTERVAL prochainTempsTrajet MINUTE) < prochainEvenement then
       set mes = concat('Insertion concert ', new.idConcert, ' impossible : date trop proche du prochain évènement du groupe ', new.idGr);
       signal SQLSTATE '45000' set MESSAGE_TEXT = mes;
     end if;
@@ -274,7 +276,7 @@ begin
   set provenance = getIdentifiantLieu(new.idGr, dernierEvenement, 'D');
   SELECT tempsDeTrajet into dernierTempsTrajet FROM DEPLACER WHERE (idLieuDepart = provenance AND idLieuArrivee = lieuAct) OR (idLieuDepart = lieuAct AND idLieuArrivee = provenance);
   if dernierEvenement is not null then
-    if ADDDATE(dernierEvenement, INTERVAL dernierTempsTrajet MINUTE) < dateAct then
+    if ADDDATE(dernierEvenement, INTERVAL dernierTempsTrajet MINUTE) < dateDebutAct then
       set mes = concat('Insertion participation du groupe ', new.idGr, " à l'activité ", new.idActAnn, ' impossible : date trop proche du dernier évènement du groupe');
       signal SQLSTATE '45000' set MESSAGE_TEXT = mes;
     end if;
