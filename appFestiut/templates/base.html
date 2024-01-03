@@ -9,6 +9,8 @@
             <!-- Bootstrap CSS -->
             {{ bootstrap.load_css() }}
             <link rel="stylesheet" href="{{url_for('static', filename='base.css')}}">
+            <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+        integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
         {% endblock %}
 
         <title>Festiut'O</title>
@@ -26,7 +28,7 @@
             </li>
             <li id="search">
                 <form method="POST" action="#" class="form-inline " role="search">
-                    <input class="form-control form-control-sm mr-3" type="search" placeholder="Rechercher" aria-label="Rechercher" name="searched">
+                    <input class="form-control form-control-sm mr-3 search-input" type="search" placeholder="Rechercher" aria-label="Rechercher" name="searched">
                     <i class="fas fa-search" aria-hidden="true"></i>
                 </form>
             </li>

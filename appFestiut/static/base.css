@@ -25,7 +25,7 @@ body {
     border: solid gray 1px;
     border-radius: 10px;
     padding: 1em;
-    background-color: rgba(0, 0, 0, 0.40);
+    background-color: rgba(13, 10, 44, 0.60);
 }
 
 h1 {
@@ -44,21 +44,23 @@ ul {
 
 #header {
     position: fixed;
+    top: 10;
     left: 0;
     right: 0;
-    top: 0;
+    margin: auto; 
     transition: 0.3s;
     transition-delay: 0.2s;
     box-shadow: 1px 1px 4px 0 rgba(0, 0, 0, .1);
-    background-color: #DD2323;
-    width: 100%;
+    background-color: white;
+    max-width: 60%;
     z-index: 3;
-    padding: 1em;
+    border-radius: 50px;
 }
 
 #header .liens {
     display: flex;
     align-items: center;
+    justify-content: space-evenly;
     margin: 0;
     padding: 0;
 }
@@ -68,13 +70,33 @@ ul {
 }
 
 #header .liens a {
-    color: white;
+    color: black;
     font-weight: bold;
 }
 
 #header .liens li a:hover {
     transition: all 0.5s ease;
     opacity: 0.7;
+}
+
+#search {
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    border: solid black 2px;
+}
+
+.form-inline {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.form-inline>i {
+    position: relative;
+    right: 20px;
 }
 
 #footer {
