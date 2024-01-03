@@ -25,4 +25,4 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
    'sqlite:///'+ mkpath('../Fest.db'))
 db = SQLAlchemy(app)
 
-login_manager = LoginManager(app)
+# login_manager = LoginManager(app)

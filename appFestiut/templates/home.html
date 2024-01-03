@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{url_for('static', filename='home.css')}}">
+{% endblock %}
+{% block content %}
+<div class="content">
+    <h1>TESSTTTT</h1>
+    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorem tenetur, qui maxime nobis ad nemo temporibus, repellat facere molestias voluptatibus accusamus dolor ipsam veniam amet alias aut veritatis deleniti. Quos!</p>
+</div>
+{% endblock %}
