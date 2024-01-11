@@ -1,150 +1,231 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import PrimaryKeyConstraint, ForeignKeyConstraint
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///festival.db'
 db = SQLAlchemy(app)
 
 class ActiviteAnnexe(db.Model):
-    __tablename__ = 'ACTIVITE_ANNEXE'
+    __tablename__ = 'activite_annexe'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_act_ann'),
+        ForeignKeyConstraint(['id_type_act_ann'], ['type_activite_annexe.id_type_act_ann']),
+        ForeignKeyConstraint(['id_lieu'], ['lieu.id_lieu'])
+    )
 
-    idActAnn = db.Column(db.Integer, primary_key=True)
-    descriptionActAnn = db.Column(db.String(500))
-    dateDebutActAnn = db.Column(db.DateTime, nullable=False)
-    dateFinActAnn = db.Column(db.DateTime, nullable=False)
-    idTypeActAnn = db.Column(db.Integer, db.ForeignKey('TYPE_ACTIVITE_ANNEXE.idTypeActAnn'), nullable=False)
-    idLieu = db.Column(db.Integer, db.ForeignKey('LIEUX.idLieu'), nullable=False)
+    id_act_ann = db.Column(db.Integer)
+    description_act_ann = db.Column(db.String(500))
+    date_debut_act_ann = db.Column(db.DateTime, nullable=False)
+    date_fin_act_ann = db.Column(db.DateTime, nullable=False)
+    id_type_act_ann = db.Column(db.Integer, nullable=False)
+    id_lieu = db.Column(db.Integer, nullable=False)
 
 class Artiste(db.Model):
-    __tablename__ = 'ARTISTE'
+    __tablename__ = 'artiste'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_art'),
+        ForeignKeyConstraint(['id_gr'], ['groupe.id_gr'])
+    )
 
-    idArt = db.Column(db.Integer, primary_key=True)
-    nomArt = db.Column(db.String(500), nullable=False)
-    idGr = db.Column(db.Integer, db.ForeignKey('GROUPE.idGr'), nullable=False)
-    
+    id_art = db.Column(db.Integer)
+    nom_art = db.Column(db.String(500), nullable=False)
+    id_gr = db.Column(db.Integer, nullable=False)
+
 class Billet(db.Model):
-    __tablename__ = 'BILLET'
+    __tablename__ = 'billet'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_bil'),
+        ForeignKeyConstraint(['id_proprietaire'], ['festivalier.id_fest'])
+    )
 
-    idBil = db.Column(db.Integer, primary_key=True)
-    dureeValBil = db.Column(db.Integer, nullable=False)
-    idProprietaire = db.Column(db.Integer, db.ForeignKey('FESTIVALIER.idFest'), nullable=False)
+    id_bil = db.Column(db.Integer)
+    duree_val_bil = db.Column(db.Integer, nullable=False)
+    id_proprietaire = db.Column(db.Integer, nullable=False)
 
 class Participer(db.Model):
-    __tablename__ = 'PARTICIPER'
+    __tablename__ = 'participer'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_gr', 'id_act_ann'),
+        ForeignKeyConstraint(['id_gr'], ['groupe.id_gr']),
+        ForeignKeyConstraint(['id_act_ann'], ['activite_annexe.id_act_ann'])
+    )
 
-    idGr = db.Column(db.Integer, db.ForeignKey('GROUPE.idGr'), primary_key=True)
-    idActAnn = db.Column(db.Integer, db.ForeignKey('ACTIVITE_ANNEXE.idActAnn'), primary_key=True)
+    id_gr = db.Column(db.Integer, nullable=False)
+    id_act_ann = db.Column(db.Integer, nullable=False)
 
 class FavoriserGroupe(db.Model):
-    __tablename__ = 'FAVORISER_GROUPE'
+    __tablename__ = 'favoriser_groupe'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_fest', 'id_gr'),
+        ForeignKeyConstraint(['id_fest'], ['festivalier.id_fest']),
+        ForeignKeyConstraint(['id_gr'], ['groupe.id_gr'])
+    )
 
-    idFest = db.Column(db.Integer, db.ForeignKey('FESTIVALIER.idFest'), primary_key=True)
-    idGr = db.Column(db.Integer, db.ForeignKey('GROUPE.idGr'), primary_key=True)
+    id_fest = db.Column(db.Integer, nullable=False)
+    id_gr = db.Column(db.Integer, nullable=False)
 
 class FavoriserStyle(db.Model):
-    __tablename__ = 'FAVORISER_STYLE'
+    __tablename__ = 'favoriser_style'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_fest', 'id_style'),
+        ForeignKeyConstraint(['id_fest'], ['festivalier.id_fest']),
+        ForeignKeyConstraint(['id_style'], ['style_musique.id_style'])
+    )
 
-    idFest = db.Column(db.Integer, db.ForeignKey('FESTIVALIER.idFest'), primary_key=True)
-    idStyle = db.Column(db.Integer, db.ForeignKey('STYLE_MUSIQUE.idStyle'), primary_key=True)
+    id_fest = db.Column(db.Integer, nullable=False)
+    id_style = db.Column(db.Integer, nullable=False)
 
 class Festivalier(db.Model):
-    __tablename__ = 'FESTIVALIER'
+    __tablename__ = 'festivalier'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_fest'),
+    )
 
-    idFest = db.Column(db.Integer, primary_key=True)
-    prenomFest = db.Column(db.String(20), nullable=False)
-    nomFest = db.Column(db.String(50), nullable=False)
+    id_fest = db.Column(db.Integer)
+    prenom_fest = db.Column(db.String(20), nullable=False)
+    nom_fest = db.Column(db.String(50), nullable=False)
 
 class Photo(db.Model):
-    __tablename__ = 'PHOTO'
+    __tablename__ = 'photo'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_photo'),
+        ForeignKeyConstraint(['id_gr'], ['groupe.id_gr'])
+    )
 
-    idPhoto = db.Column(db.Integer, primary_key=True)
-    idGr = db.Column(db.Integer, db.ForeignKey('GROUPE.idGr'), nullable=False)
+    id_photo = db.Column(db.Integer)
+    id_gr = db.Column(db.Integer, nullable=False)
     photo = db.Column(db.BLOB)
 
 class Groupe(db.Model):
-    __tablename__ = 'GROUPE'
+    __tablename__ = 'groupe'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_gr'),
+        ForeignKeyConstraint(['id_style'], ['style_musique.id_style'])
+    )
 
-    idGr = db.Column(db.Integer, primary_key=True)
-    nomGr = db.Column(db.String(500), nullable=False)
-    descriptionGr = db.Column(db.String(500))
-    reseauxGr = db.Column(db.String(500))
-    idStyle = db.Column(db.Integer, db.ForeignKey('STYLE_MUSIQUE.idStyle'), nullable=False)
+    id_gr = db.Column(db.Integer)
+    nom_gr = db.Column(db.String(500), nullable=False)
+    description_gr = db.Column(db.String(500))
+    reseaux_gr = db.Column(db.String(500))
+    id_style = db.Column(db.Integer, nullable=False)
 
 class Hebergement(db.Model):
-    __tablename__ = 'HEBERGEMENT'
+    __tablename__ = 'hebergement'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_heberg'),
+    )
 
-    idHeberg = db.Column(db.Integer, primary_key=True)
-    libelleHeberg = db.Column(db.String(50), nullable=False)
-    capaciteHeberg = db.Column(db.Integer, nullable=False)
+    id_heberg = db.Column(db.Integer)
+    libelle_heberg = db.Column(db.String(50), nullable=False)
+    capacite_heberg = db.Column(db.Integer, nullable=False)
 
 class Instrument(db.Model):
-    __tablename__ = 'INSTRUMENT'
+    __tablename__ = 'instrument'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_instr'),
+    )
 
-    idInstr = db.Column(db.Integer, primary_key=True)
+    id_instr = db.Column(db.Integer)
     instrument = db.Column(db.String(30))
 
 class JouerInstru(db.Model):
-    __tablename__ = 'JOUER_INSTRU'
+    __tablename__ = 'jouer_instru'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_art', 'id_instr'),
+        ForeignKeyConstraint(['id_art'], ['artiste.id_art']),
+        ForeignKeyConstraint(['id_instr'], ['instrument.id_instr'])
+    )
 
-    idArt = db.Column(db.Integer, db.ForeignKey('ARTISTE.idArt'), primary_key=True)
-    idInstr = db.Column(db.Integer, db.ForeignKey('INSTRUMENT.idInstr'), primary_key=True)
+    id_art = db.Column(db.Integer, nullable=False)
+    id_instr = db.Column(db.Integer, nullable=False)
 
-class Lieux(db.Model):
-    __tablename__ = 'LIEUX'
+class Lieu(db.Model):
+    __tablename__ = 'lieu'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_lieu'),
+    )
 
-    idLieu = db.Column(db.Integer, primary_key=True)
+    id_lieu = db.Column(db.Integer)
     lieu = db.Column(db.String(500), nullable=False)
-    capaciteLieu = db.Column(db.Integer, nullable=False)
+    capacite_lieu = db.Column(db.Integer, nullable=False)
 
 class Deplacer(db.Model):
-    __tablename__ = 'DEPLACER'
+    __tablename__ = 'deplacer'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_lieu_depart', 'id_lieu_arrivee'),
+        ForeignKeyConstraint(['id_lieu_depart'], ['lieu.id_lieu']),
+        ForeignKeyConstraint(['id_lieu_arrivee'], ['lieu.id_lieu'])
+    )
 
-    idLieuDepart = db.Column(db.Integer, db.ForeignKey('LIEUX.idLieu'), primary_key=True)
-    idLieuArrivee = db.Column(db.Integer, db.ForeignKey('LIEUX.idLieu'), primary_key=True)
-    tempsDeTrajet = db.Column(db.Integer, nullable=False)
+    id_lieu_depart = db.Column(db.Integer, nullable=False)
+    id_lieu_arrivee = db.Column(db.Integer, nullable=False)
+    temps_de_trajet = db.Column(db.Integer, nullable=False)
 
 class Occuper(db.Model):
-    __tablename__ = 'OCCUPER'
+    __tablename__ = 'occuper'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_gr', 'id_heberg', 'date_heberg'),
+        ForeignKeyConstraint(['id_gr'], ['groupe.id_gr']),
+        ForeignKeyConstraint(['id_heberg'], ['hebergement.id_heberg'])
+    )
 
-    idGr = db.Column(db.Integer, db.ForeignKey('GROUPE.idGr'), primary_key=True)
-    idHeberg = db.Column(db.Integer, db.ForeignKey('HEBERGEMENT.idHeberg'), primary_key=True)
-    dateHeberg = db.Column(db.Date, nullable=False)
+    id_gr = db.Column(db.Integer, nullable=False)
+    id_heberg = db.Column(db.Integer, nullable=False)
+    date_heberg = db.Column(db.Date, nullable=False)
 
 class Concert(db.Model):
-    __tablename__ = 'CONCERT'
+    __tablename__ = 'concert'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_concert'),
+        ForeignKeyConstraint(['id_gr'], ['groupe.id_gr']),
+        ForeignKeyConstraint(['id_lieu'], ['lieu.id_lieu'])
+    )
 
-    idConcert = db.Column(db.Integer, primary_key=True)
-    dateDebutConcert = db.Column(db.DateTime, nullable=False)
-    dateFinConcert = db.Column(db.DateTime, nullable=False)
-    dureeMontage = db.Column(db.Integer, nullable=False)
-    dureeDemontage = db.Column(db.Integer, nullable=False)
-    idGr = db.Column(db.Integer, db.ForeignKey('GROUPE.idGr'), nullable=False)
-    idLieu = db.Column(db.Integer, db.ForeignKey('LIEUX.idLieu'), nullable=False)
+    id_concert = db.Column(db.Integer)
+    date_debut_concert = db.Column(db.DateTime, nullable=False)
+    date_fin_concert = db.Column(db.DateTime, nullable=False)
+    duree_montage = db.Column(db.Integer, nullable=False)
+    duree_demontage = db.Column(db.Integer, nullable=False)
+    id_gr = db.Column(db.Integer, nullable=False)
+    id_lieu = db.Column(db.Integer, nullable=False)
 
 class Reserver(db.Model):
-    __tablename__ = 'RESERVER'
+    __tablename__ = 'reserver'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_concert', 'id_bil'),
+        ForeignKeyConstraint(['id_concert'], ['concert.id_concert']),
+        ForeignKeyConstraint(['id_bil'], ['billet.id_bil'])
+    )
 
-    idConcert = db.Column(db.Integer, db.ForeignKey('CONCERT.idConcert'), primary_key=True)
-    idBil = db.Column(db.Integer, db.ForeignKey('BILLET.idBil'), primary_key=True)
+    id_concert = db.Column(db.Integer, nullable=False)
+    id_bil = db.Column(db.Integer, nullable=False)
 
 class StyleMusique(db.Model):
-    __tablename__ = 'STYLE_MUSIQUE'
+    __tablename__ = 'style_musique'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_style'),
+        ForeignKeyConstraint(['id_type'], ['type_musique.id_type'])
+    )
 
-    idStyle = db.Column(db.Integer, primary_key=True)
+    id_style = db.Column(db.Integer)
     style = db.Column(db.String(30), nullable=False)
-    idType = db.Column(db.Integer, db.ForeignKey('TYPE_MUSIQUE.idType'), nullable=False)
+    id_type = db.Column(db.Integer, nullable=False)
 
 class TypeActiviteAnnexe(db.Model):
-    __tablename__ = 'TYPE_ACTIVITE_ANNEXE'
+    __tablename__ = 'type_activite_annexe'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_type_act_ann'),
+    )
 
-    idTypeActAnn = db.Column(db.Integer, primary_key=True)
+    id_type_act_ann = db.Column(db.Integer)
     activite = db.Column(db.String(500), nullable=False)
 
 class TypeMusique(db.Model):
-    __tablename__ = 'TYPE_MUSIQUE'
+    __tablename__ = 'type_musique'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_type'),
+    )
 
-    idType = db.Column(db.Integer, primary_key=True)
-    typeMus = db.Column(db.String(30), nullable=False)
-    
-    
-
+    id_type = db.Column(db.Integer)
+    type_mus = db.Column(db.String(30), nullable=False)
