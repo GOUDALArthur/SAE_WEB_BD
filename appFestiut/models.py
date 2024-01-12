@@ -3,10 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import PrimaryKeyConstraint, ForeignKeyConstraint
 from .app import db
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///festival.db'
-db = SQLAlchemy(app)
-
 class ActiviteAnnexe(db.Model):
     __tablename__ = 'activite_annexe'
     __table_args__ = (
@@ -87,7 +83,7 @@ class Festivalier(db.Model):
     prenom_fest = db.Column(db.String(20), nullable=False)
     nom_fest = db.Column(db.String(50), nullable=False)
     mail_fest = db.Column(db.String(50), nullable=False)
-    mdp_fest = db.Column(db.String(50), nullable=False)
+    mdp_fest = db.Column(db.String(50), nullable=True)
 
 class Photo(db.Model):
     __tablename__ = 'photo'
