@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import PrimaryKeyConstraint, ForeignKeyConstraint
+from flask_login import UserMixin
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///festival.db'
@@ -76,7 +77,7 @@ class FavoriserStyle(db.Model):
     id_fest = db.Column(db.Integer, nullable=False)
     id_style = db.Column(db.Integer, nullable=False)
 
-class Festivalier(db.Model):
+class Festivalier(db.Model, UserMixin):
     __tablename__ = 'festivalier'
     __table_args__ = (
         PrimaryKeyConstraint('id_fest'),
@@ -87,6 +88,33 @@ class Festivalier(db.Model):
     nom_fest = db.Column(db.String(50), nullable=False)
     mail_fest = db.Column(db.String(50), nullable=False)
     mdp_fest = db.Column(db.String(50), nullable=False)
+
+    @property
+    def is_authenticated(self) -> bool :
+        """Retourne si l'utilisateur est authentifié.
+
+        Returns:
+            bool: True si l'utilisateur est authentifié, False sinon.
+        """
+        return True
+
+    @property
+    def is_active(self) -> bool :
+        """Retourne si l'utilisateur est actif.
+
+        Returns:
+            bool: True si l'utilisateur est actif, False sinon.
+        """
+        return True
+
+    @property
+    def is_anonymous(self) -> bool :
+        """Retourne si l'utilisateur est anonyme.
+
+        Returns:
+            bool: True si l'utilisateur est anonyme, False sinon.
+        """
+        return False
 
 class Photo(db.Model):
     __tablename__ = 'photo'
