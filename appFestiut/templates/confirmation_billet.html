@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="{{url_for('static', filename='confirmation_billet.css')}}">
     <h1>Confirmation d'achat</h1>
     <p>Veuillez entrer vos détails et effectuer le paiement à l'adresse crypto ci-dessous</p>
-
+    <div id="formulaire">
     <form action="{{ url_for('payer_billet') }}" method="post">
         <label for="nom">Nom:</label>
         <input type="text" id="nom" name="nom" required>
@@ -23,4 +23,5 @@
 
         <input type="submit" value="Confirmer l'achat">
     </form>
+    </div>
 {% endblock %}
