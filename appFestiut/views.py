@@ -1,5 +1,5 @@
 from flask import redirect, render_template, request, url_for
-from appFestiut import app
+from . import *
 from flask_login import login_user , current_user, logout_user, login_required
 from wtforms import EmailField, StringField, HiddenField, PasswordField, DateField,SelectField,SelectMultipleField,TextAreaField
 from wtforms.validators import InputRequired, Email, Length, EqualTo, ValidationError

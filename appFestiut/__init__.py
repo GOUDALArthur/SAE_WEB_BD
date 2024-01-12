@@ -3,3 +3,4 @@ from .app import app
 import appFestiut.views
 import appFestiut.commands
 import appFestiut.models
+from .models import *

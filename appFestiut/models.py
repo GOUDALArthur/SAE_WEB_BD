@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import PrimaryKeyConstraint, ForeignKeyConstraint
+from .app import db
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///festival.db'
@@ -231,3 +232,5 @@ class TypeMusique(db.Model):
 
     id_type = db.Column(db.Integer)
     type_mus = db.Column(db.String(30), nullable=False)
+
+
