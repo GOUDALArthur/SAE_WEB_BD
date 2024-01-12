@@ -85,6 +85,8 @@ class Festivalier(db.Model):
     id_fest = db.Column(db.Integer)
     prenom_fest = db.Column(db.String(20), nullable=False)
     nom_fest = db.Column(db.String(50), nullable=False)
+    mail_fest = db.Column(db.String(50), nullable=False)
+    mdp_fest = db.Column(db.String(50), nullable=False)
 
 class Photo(db.Model):
     __tablename__ = 'photo'
