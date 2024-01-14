@@ -101,3 +101,15 @@ main .container {
 main {
     margin-bottom: 5vh;
 }
+
+.btn-outline-success {
+    color: #fff;
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-outline-success:hover {
+    color: #fff;
+    background-color: #218838;
+    border-color: #1e7e34;
+}

@@ -39,6 +39,8 @@
 
             {% if not current_user.is_authenticated %}
 
+            
+
             <li id="connection">
                 <a href ="{{ url_for('login')}}">Connexion</a>
             </li>
@@ -49,6 +51,10 @@
             {% endif %}
 
             {% if current_user.is_authenticated %}
+
+            <li id="connection">
+                <a href ="{{ url_for('get_favorites')}}">Mes favoris</a>
+            </li>
 
             <li id="connection">
                 <a href ="{{ url_for('changer_profil')}}">Modifier Profil</a>
@@ -67,12 +73,12 @@
             {% endif %}
 
 
-
             <li id="search">
-                <form method="POST" action="#" class="form-inline " role="search">
-                    <input class="form-control form-control-sm mr-3" type="search" placeholder="Rechercher" aria-label="Rechercher" name="searched">
-                    <i class="fas fa-search" aria-hidden="true"></i>
+                <form method="POST" action="{{ url_for('search') }}" class="form-inline d-flex" role="search">
+                    <input class="form-control form-control-sm mr-3" type="search" placeholder="Rechercher" aria-label="Rechercher" name="searched" style="margin-right: 10px;">
+                    <button type="submit" class="btn btn-outline-success my-2 my-sm-0"><i class="fas fa-search" aria-hidden="true"></i></button>
                 </form>
+                <ul id="search-results"></ul>
             </li>
         </ul>
     </header>

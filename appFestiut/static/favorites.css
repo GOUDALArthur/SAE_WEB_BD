@@ -1,0 +1,28 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+#favorites {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+#favorites h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.favorite {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.favorite p {
+    margin: 0;
+    color: #333;
+}

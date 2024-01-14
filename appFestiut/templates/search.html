@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Resultat de la recherche pour "{{ search_term }}" </h1>
+    
+
+    {% if results %}
+    {% for result in results %}
+    <div class="search-result">
+        <h2>{{ result.nom_gr or result.nom_art or result.style}} 
+            <button class="favorite-button" data-id="{{ result.id }}" data-type="{{ 'group' if result.nom_gr else 'style' if result.nom_style else 'artist' }}">Favoris</button>    </h2>
+    </div>
+{% endfor %}
+    {% else %}
+        <p>Pas de résultat trouve pour "{{ search_term }}".</p>
+    {% endif %}
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.favorite-button').click(function() {
+                var id = $(this).data('id');
+                var type = $(this).data('type');
+                var button = $(this);
+        
+                $.ajax({
+                    url: "/add_to_favorites/" + type,
+                    data: { 'id': id },
+                    type: 'POST',
+                    success: function(response) {
+                        button.text('Ajouté aux favoris');
+                    },
+                    error: function(response) {
+                        // Handle error here
+                        console.log(response);
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

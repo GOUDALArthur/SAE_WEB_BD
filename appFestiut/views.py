@@ -13,6 +13,7 @@ from flask import request, flash
 from datetime import timedelta
 
 
+
 @app.route("/")
 def home():
     if current_user.is_authenticated:
@@ -201,4 +202,72 @@ def mes_tickets():
     tickets = Billet.query.filter_by(id_proprietaire=user_id).all()
 
     return render_template("tickets.html", tickets=tickets, timedelta=timedelta)
+
+from flask import jsonify
+
+from flask import request
+
+@app.route('/search', methods=['POST'])
+def search():
+    search_term = request.form.get('searched')
+
+    groupes = Groupe.query.filter(Groupe.nom_gr.contains(search_term)).all()
+    artistes = Artiste.query.filter(Artiste.nom_art.contains(search_term)).all()
+    styles = StyleMusique.query.filter(StyleMusique.style.contains(search_term)).all()
+
+    results = groupes + artistes + styles
+
+    return render_template('search.html', results=results, search_term=search_term)
+
+@app.route('/add_to_favorites/<string:type>', methods=['POST'])
+def add_to_favorites(type):
+    id = request.form.get('id')
+
+    if type == 'group':
+        favorite = FavoriserGroupe.query.filter_by(id_fest=current_user.id_fest, id_gr=id).first()
+
+        if favorite:
+            return jsonify({'message': 'Group already in favorites'}), 400
+
+        new_favorite = FavoriserGroupe(id_fest=current_user.id_fest, id_gr=id)
+    elif type == 'style':
+        favorite = FavoriserStyle.query.filter_by(id_fest=current_user.id_fest, id_style=id).first()
+
+        if favorite:
+            return jsonify({'message': 'Style already in favorites'}), 400
+
+        new_favorite = FavoriserStyle(id_fest=current_user.id_fest, id_style=id)
+        
+    elif type == 'artist':
+        favorite = FavoriserArtist.query.filter_by(id_fest=current_user.id_fest, id_artist=id).first()
+
+        if favorite:
+            return jsonify({'message': 'Artist already in favorites'}), 400
+
+        new_favorite = FavoriserArtist(id_fest=current_user.id_fest, id_artist=id)
+    
+    else:
+        return jsonify({'message': 'Invalid type'}), 400
+
+    db.session.add(new_favorite)
+    db.session.commit()
+
+    return jsonify({'message': f'{type.capitalize()} added to favorites'}), 200
+
+@app.route('/favorites', methods=['GET'])
+@login_required
+def get_favorites():
+    # Get the user's favorite groups
+    favorite_groups = FavoriserGroupe.query.filter_by(id_fest=current_user.id_fest).all()
+    favorite_groups = [(Groupe.query.get(favorite.id_gr), 'group') for favorite in favorite_groups]
+
+    # Get the user's favorite styles
+    favorite_styles = FavoriserStyle.query.filter_by(id_fest=current_user.id_fest).all()
+    favorite_styles = [(StyleMusique.query.get(favorite.id_style), 'style') for favorite in favorite_styles]
+
+    # Combine the favorite groups and styles into one list
+    favorites = favorite_groups + favorite_styles
+
+    return render_template('favori.html', favorites=favorites)
+
 
