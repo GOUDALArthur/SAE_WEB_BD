@@ -40,7 +40,10 @@
             {% if not current_user.is_authenticated %}
 
             <li id="connection">
-                <a href ="{{ url_for('login')}}">Connection</a>
+                <a href ="{{ url_for('login')}}">Connexion</a>
+            </li>
+            <li id="connection">
+                <a href ="{{ url_for('creer_user')}}">S'inscrire</a>
             </li>
 
             {% endif %}
@@ -48,8 +51,18 @@
             {% if current_user.is_authenticated %}
 
             <li id="connection">
+                <a href ="{{ url_for('changer_profil')}}">Modifier Profil</a>
+            </li>
+
+            <li id="connection">
+                <a href ="{{ url_for('mes_tickets')}}">Mes billets</a>
+            </li>
+
+            <li id="connection">
                 <a href ="{{ url_for('logout')}}">Déconnection</a>
             </li>
+            
+            
 
             {% endif %}
 

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="{{url_for('static', filename='tickets.css')}}">
+    <h1>Mes Billets, {{ current_user.prenom_fest }} {{ current_user.nom_fest }}</h1>
+    <p>Voici la liste de vos billets achetés :</p>
+    <div id="formulaire">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID du Billet</th>
+                    <th>Durée de Validité </th>
+                    <th> Date d'achat </th>
+                    <th> Date de fin de validité </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in tickets %}
+                <tr>
+                    <td>{{ ticket.id_bil }}</td>
+                    <td>{{ ticket.duree_val_bil }} jours</td>
+                    <td> {{ ticket.date_achat_bil }} </td>
+                    <td> {{ (ticket.date_achat_bil + timedelta(days=ticket.duree_val_bil)) }} </td>
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

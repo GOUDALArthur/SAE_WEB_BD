@@ -1,3 +1,6 @@
+
+import datetime
+from re import RegexFlag
 from flask import redirect, render_template, request, url_for
 from . import *
 from flask_login import login_user , current_user, logout_user, login_required
@@ -6,7 +9,9 @@ from wtforms.validators import InputRequired, Email, Length, EqualTo, Validation
 from flask_wtf import FlaskForm
 from hashlib import sha256
 from .models import *
-from flask import request
+from flask import request, flash
+from datetime import timedelta
+
 
 @app.route("/")
 def home():
@@ -87,10 +92,8 @@ def enregistrement_billet():
         jours = int(request.form.get('jours'))
         id_proprietaire = int(request.form.get('id_proprietaire'))
 
-        # Créer un nouveau billet
-        billet = Billet(duree_val_bil=jours, id_proprietaire=id_proprietaire)
+        billet = Billet(duree_val_bil=jours, id_proprietaire=id_proprietaire, date_achat_bil=datetime.datetime.now().date())
 
-        # Ajouter le billet à la base de données
         try:
             
             db.session.add(billet)
@@ -103,4 +106,99 @@ def enregistrement_billet():
     else:
         print("Form errors:", form.errors)
     return render_template("billet.html", form=form)
+
+
+
+
+class RegisterForm(FlaskForm):
+    nom = StringField("Nom", validators=[InputRequired()])
+    prenom = StringField("Prenom", validators=[InputRequired()])
+    mail = EmailField("Mail", validators=[InputRequired()])
+    num = StringField("Numéro", validators=[InputRequired()])
+    password = PasswordField("Password", validators=[InputRequired()])
+    next = HiddenField()
+    
+import tkinter
+from tkinter import messagebox
+
+def afficher_popup(message):
+    root = tkinter.Tk()
+    root.withdraw()
+    messagebox.showinfo("Message", message)
+    root.destroy()
+
+    
+
+@app.route("/create-user/", methods=("GET","POST",))
+def creer_user():
+    """Affiche le formulaire de création d'un utilisateur
+    """
+    form =RegisterForm()
+    if form.is_submitted():
+        existing_user = Festivalier.query.filter_by(mail_fest=form.mail.data).first()
+        if existing_user:
+            afficher_popup('Ce mail est déjà utilisé,veuillez utiliser un autre.')
+            return render_template("register.html", form=form)
+        
+        password_hash = sha256(form.password.data.encode()).hexdigest()
+        new_personne = Festivalier(mail_fest=form.mail.data,mdp_fest=password_hash,nom_fest=form.nom.data,prenom_fest=form.prenom.data,num_fest=form.num.data)
+
+        try:
+            
+            db.session.add(new_personne)
+            db.session.commit()
+            login_user(new_personne)
+        except Exception as e:
+            print("Error adding billet to database:", e)
+            db.session.rollback()
+
+        return redirect(url_for("home"))
+    return render_template("register.html", form=form)
+
+
+class ChangeProfilForm(FlaskForm):
+    nom = StringField("Nom")
+    prenom = StringField("Prenom")
+    mail = EmailField("Mail")
+    num = StringField("Numero")
+    password = PasswordField("Password")
+    next = HiddenField()
+
+
+@app.route("/change-profil/",methods=("GET","POST",))
+def changer_profil():
+    """Affiche le formulaire de mise à jour de profil
+    """
+    u  = current_user.id_fest
+    user = Festivalier.query.get(u) 
+    f = ChangeProfilForm()
+
+    if f.is_submitted():
+        existing_user = Festivalier.query.filter(Festivalier.mail_fest==f.mail.data, Festivalier.id_fest!=u).first()
+
+        if existing_user:
+            afficher_popup('Ce mail est déjà utilisé,veuillez utiliser un autre.')
+            return render_template("profil.html", form=f)
+        
+        if f.password.data !="":
+            password_hash = sha256(f.password.data.encode()).hexdigest()
+            user.mdp_fest = password_hash
+        user.nom_fest = f.nom.data
+        user.prenom_fest = f.prenom.data
+        user.num_fest =  f.num.data
+        user.mail_fest = f.mail.data
+
+        db.session.commit()
+        return redirect(url_for("home"))
+    return render_template("profil.html", form=f)
+
+
+@app.route("/tickes/")
+def mes_tickets():
+    """Affiche les billets achetés par l'utilisateur actuel
+    """
+    user_id = current_user.id_fest
+    tickets = Billet.query.filter_by(id_proprietaire=user_id).all()
+
+    return render_template("tickets.html", tickets=tickets, timedelta=timedelta)
 

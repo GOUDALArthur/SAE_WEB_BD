@@ -40,6 +40,7 @@ class Billet(db.Model):
     id_bil = db.Column(db.Integer)
     duree_val_bil = db.Column(db.Integer, nullable=False)
     id_proprietaire = db.Column(db.Integer, nullable=False)
+    date_achat_bil = db.Column(db.Date, nullable=False)
 
 class Participer(db.Model):
     __tablename__ = 'participer'
@@ -84,7 +85,8 @@ class Festivalier(db.Model):
     prenom_fest = db.Column(db.String(20), nullable=False)
     nom_fest = db.Column(db.String(50), nullable=False)
     mail_fest = db.Column(db.String(50), nullable=False)
-    mdp_fest = db.Column(db.String(50), nullable=True)
+    num_fest = db.Column(db.String(10), nullable=False)
+    mdp_fest = db.Column(db.String(50), nullable=False)
 
     @property
     def is_authenticated(self):

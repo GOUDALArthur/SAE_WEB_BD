@@ -9,7 +9,7 @@ from hashlib import sha256
 def syncdb():
     """Create all missing tables"""
     db.create_all()
-    user1 = Festivalier(id_fest=1 ,prenom_fest="Karim",nom_fest="Poulet", mail_fest = "b@gmail.com", mdp_fest = sha256("b".encode()).hexdigest())
+    user1 = Festivalier(id_fest=1 ,prenom_fest="Karim",nom_fest="Poulet", mail_fest = "b@gmail.com", mdp_fest = sha256("b".encode()).hexdigest(), num_fest="982732837")
 
     db.session.add(user1)
     db.session.commit()
