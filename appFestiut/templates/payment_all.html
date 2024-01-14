@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{url_for('static', filename='payment_festival.css')}}">
+    <h1>Récapitulatif pour votre achat, {{ current_user.prenom_fest }} {{ current_user.nom_fest }}</h1>
+    <p>Vous avez choisi un billet pour tout le festival.</p>
+    <p>Le prix total pour ce billet est de 150€.</p>
+
+    <div class="ticket-forms">
+        <form action="{{ url_for('enregistrement_billet') }}" method="post">
+            {{ form.hidden_tag() }}
+
+            <input type="hidden" name="id_proprietaire" value="{{ current_user.id_fest }}">
+            <input type="hidden" name="jours" value="100">
+
+            <label for="name">Nom sur la carte :</label>
+            <input type="text" id="name" name="name" required>
+    
+            <label for="cardNumber">Numéro de carte :</label>
+            <input type="text" id="cardNumber" name="cardNumber" required>
+    
+            <label for="expiry">Date d'expiration :</label>
+            <input type="text" id="expiry" name="expiry" required>
+    
+            <label for="cvc">CVC :</label>
+            <input type="text" id="cvc" name="cvc" required>
+    
+            <input type="submit" value="Payer">
+        </form>
+    </div>
+{% endblock %}

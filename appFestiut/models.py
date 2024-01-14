@@ -1,7 +1,8 @@
 from flask import Flask
+
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import PrimaryKeyConstraint, ForeignKeyConstraint
-from .app import db
+from .app import db, login_manager
 
 class ActiviteAnnexe(db.Model):
     __tablename__ = 'activite_annexe'
@@ -84,6 +85,21 @@ class Festivalier(db.Model):
     nom_fest = db.Column(db.String(50), nullable=False)
     mail_fest = db.Column(db.String(50), nullable=False)
     mdp_fest = db.Column(db.String(50), nullable=True)
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_active(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return str(self.id_fest)
 
 class Photo(db.Model):
     __tablename__ = 'photo'
@@ -228,5 +244,10 @@ class TypeMusique(db.Model):
 
     id_type = db.Column(db.Integer)
     type_mus = db.Column(db.String(30), nullable=False)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Festivalier.query.get(int(user_id))
+
 
 
