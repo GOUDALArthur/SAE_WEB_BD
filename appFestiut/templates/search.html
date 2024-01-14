@@ -7,8 +7,8 @@
     {% if results %}
     {% for result in results %}
     <div class="search-result">
-        <h2>{{ result.nom_gr or result.nom_art or result.style}} 
-            <button class="favorite-button" data-id="{{ result.id }}" data-type="{{ 'group' if result.nom_gr else 'style' if result.nom_style else 'artist' }}">Favoris</button>    </h2>
+        <h2>{{ result.nom_gr or result.style}} 
+            <button class="favorite-button" data-id="{{ result.id }}" data-type="{{ 'group' if result.nom_gr else 'style' }}">Favoris</button>    </h2>
     </div>
 {% endfor %}
     {% else %}
@@ -32,7 +32,7 @@
                         button.text('Ajouté aux favoris');
                     },
                     error: function(response) {
-                        // Handle error here
+
                         console.log(response);
                     }
                 });
