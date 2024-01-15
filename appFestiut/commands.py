@@ -1,6 +1,6 @@
 import click
 from .app import app, db
-from .models import Festivalier,Deplacer,Reserver,Concert,Occuper,Hebergement,Participer,Billet,Lieu,TypeActiviteAnnexe,JouerInstru ,Instrument, Artiste, TypeMusique, FavoriserGroupe, FavoriserStyle, Groupe, Photo, StyleMusique, ActiviteAnnexe, FavoriserGroupe, FavoriserStyle, Festivalier, Photo, Groupe, StyleMusique, ActiviteAnnexe
+from .models import FavoriserArtiste,Festivalier,Deplacer,Reserver,Concert,Occuper,Hebergement,Participer,Billet,Lieu,TypeActiviteAnnexe,JouerInstru ,Instrument, Artiste, TypeMusique, FavoriserGroupe, FavoriserStyle, Groupe, Photo, StyleMusique, ActiviteAnnexe, FavoriserGroupe, FavoriserStyle, Festivalier, Photo, Groupe, StyleMusique, ActiviteAnnexe
 from hashlib import sha256
 from datetime import datetime
 

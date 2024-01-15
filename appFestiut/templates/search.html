@@ -7,7 +7,7 @@
     {% if results %}
     {% for result in results %}
     <div class="search-result">
-        <h2>{{ result.nom_gr or result.style}} 
+        <h2>{{ result.nom_gr or result.style or result.artiste}} 
             <button class="favorite-button" data-id="{{ result.id }}" data-type="{{ 'group' if result.nom_gr else 'style' }}">Favoris</button>    </h2>
     </div>
 {% endfor %}

@@ -64,6 +64,18 @@ class FavoriserGroupe(db.Model):
     id_fest = db.Column(db.Integer, nullable=False)
     id_gr = db.Column(db.Integer, nullable=False)
 
+class FavoriserArtiste(db.Model):
+    __tablename__ = 'favoriser_artiste'
+    __table_args__ = (
+        PrimaryKeyConstraint('id_fest', 'id_art'),
+        ForeignKeyConstraint(['id_fest'], ['festivalier.id_fest']),
+        ForeignKeyConstraint(['id_art'], ['artiste.id_art'])
+    )
+
+    id_fest = db.Column(db.Integer, nullable=False)
+    id_art = db.Column(db.Integer, nullable=False)
+
+
 class FavoriserStyle(db.Model):
     __tablename__ = 'favoriser_style'
     __table_args__ = (

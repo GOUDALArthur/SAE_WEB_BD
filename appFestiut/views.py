@@ -9,9 +9,8 @@ from wtforms.validators import InputRequired, Email, Length, EqualTo, Validation
 from flask_wtf import FlaskForm
 from hashlib import sha256
 from .models import *
-from flask import request, flash, jsonify
+from flask import request, flash
 from datetime import timedelta
-
 
 
 
@@ -204,6 +203,9 @@ def mes_tickets():
 
     return render_template("tickets.html", tickets=tickets, timedelta=timedelta)
 
+from flask import jsonify
+
+from flask import request
 
 @app.route('/search', methods=['POST'])
 def search():
@@ -235,6 +237,14 @@ def add_to_favorites(type):
             return jsonify({'message': 'Style already in favorites'}), 400
 
         new_favorite = FavoriserStyle(id_fest=current_user.id_fest, id_style=id)
+        
+    elif type == 'artist':
+        favorite = FavoriserArtiste.query.filter_by(id_fest=current_user.id_fest, id_artist=id).first()
+
+        if favorite:
+            return jsonify({'message': 'Artist already in favorites'}), 400
+
+        new_favorite = FavoriserArtiste(id_fest=current_user.id_fest, id_artist=id)
     
     else:
         return jsonify({'message': 'Invalid type'}), 400
@@ -247,13 +257,15 @@ def add_to_favorites(type):
 @app.route('/favorites', methods=['GET'])
 @login_required
 def get_favorites():
-
+    # Get the user's favorite groups
     favorite_groups = FavoriserGroupe.query.filter_by(id_fest=current_user.id_fest).all()
     favorite_groups = [(Groupe.query.get(favorite.id_gr), 'group') for favorite in favorite_groups]
 
+    # Get the user's favorite styles
     favorite_styles = FavoriserStyle.query.filter_by(id_fest=current_user.id_fest).all()
     favorite_styles = [(StyleMusique.query.get(favorite.id_style), 'style') for favorite in favorite_styles]
 
+    # Combine the favorite groups and styles into one list
     favorites = favorite_groups + favorite_styles
 
     return render_template('favori.html', favorites=favorites)
