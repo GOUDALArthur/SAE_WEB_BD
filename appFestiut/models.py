@@ -30,6 +30,9 @@ class Artiste(db.Model):
     nom_art = db.Column(db.String(500), nullable=False)
     id_gr = db.Column(db.Integer, nullable=False)
 
+    def get_name(self):
+        return self.nom_art
+
 class Billet(db.Model):
     __tablename__ = 'billet'
     __table_args__ = (
@@ -139,6 +142,9 @@ class Groupe(db.Model):
     reseaux_gr = db.Column(db.String(500))
     id_style = db.Column(db.Integer, nullable=False)
 
+    def get_name(self):
+        return self.nom_gr
+
 class Hebergement(db.Model):
     __tablename__ = 'hebergement'
     __table_args__ = (
@@ -240,6 +246,10 @@ class StyleMusique(db.Model):
     id_style = db.Column(db.Integer)
     style = db.Column(db.String(30), nullable=False)
     id_type = db.Column(db.Integer, nullable=False)
+
+    def get_name(self):
+        return self.nom_style
+
 
 class TypeActiviteAnnexe(db.Model):
     __tablename__ = 'type_activite_annexe'

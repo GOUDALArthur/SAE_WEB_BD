@@ -4,15 +4,29 @@
 
 <div id="favorites">
   <h1>Mes favoris</h1>
-  {% for favorite, type in favorites %}
-    <div class="favorite">
-      {% if type == 'group' %}
-        <p>Groupe : {{ favorite.nom_gr }}</p>
-      {% else %}
-        <p>Style de musique : {{ favorite.nom_style }}</p>
-      {% endif %}
-    </div>
-  {% endfor %}
+  <div class="favorite">
+    <p>Groupe : 
+      {% for favorite, type in favorites %}
+        {% if type == 'group' %}
+          {{ favorite.nom_gr }},
+        {% endif %}
+      {% endfor %}
+    </p>
+    <p>Style de musique : 
+      {% for favorite, type in favorites %}
+        {% if type == 'style' %}
+          {{ favorite.style }},
+        {% endif %}
+      {% endfor %}
+    </p>
+    <p>Artiste : 
+      {% for favorite, type in favorites %}
+        {% if type == 'artist' %}
+          {{ favorite.nom_art }},
+        {% endif %}
+      {% endfor %}
+    </p>
+  </div>
 </div>
 
 {% endblock content %}

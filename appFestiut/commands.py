@@ -22,11 +22,20 @@ def syncdb():
     style1 = StyleMusique(id_style=1, style="Hard Rock", id_type=1)
     db.session.add(style1)
 
+    style2 = StyleMusique(id_style=2, style="electro", id_type=1)
+    db.session.add(style2)
+
     group1 = Groupe(id_gr=1, nom_gr="The Rockers", description_gr="A rock band", reseaux_gr="www.therockers.com", id_style=1)
     db.session.add(group1)
 
+    group2 = Groupe(id_gr=3, nom_gr="The caca", description_gr="A rock band", reseaux_gr="www.therockers.com", id_style=1)
+    db.session.add(group2)
+
     artist1 = Artiste(id_art=1, nom_art="Rocky", id_gr=1)
     db.session.add(artist1)
+
+    artist2 = Artiste(id_art=2, nom_art="Mimi", id_gr=1)
+    db.session.add(artist2)
 
     instr1 = Instrument(id_instr=1, instrument="Guitar")
     db.session.add(instr1)
@@ -49,12 +58,6 @@ def syncdb():
 
     part1 = Participer(id_gr=1, id_act_ann=1)
     db.session.add(part1)
-
-    fav_gr1 = FavoriserGroupe(id_fest=1, id_gr=1)
-    db.session.add(fav_gr1)
-
-    fav_st1 = FavoriserStyle(id_fest=1, id_style=1)
-    db.session.add(fav_st1)
 
     photo1 = Photo(id_photo=1, id_gr=1, photo=b'\x00\x01\x02\x03')
     db.session.add(photo1)

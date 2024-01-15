@@ -219,9 +219,13 @@ def search():
 
     return render_template('search.html', results=results, search_term=search_term)
 
-@app.route('/add_to_favorites/<string:type>', methods=['POST'])
-def add_to_favorites(type):
+
+@app.route('/add_to_favorites', methods=['POST'])
+def add_to_favorites():
     id = request.form.get('id')
+    type = request.form.get('type')
+    print(type)
+    print(id)
 
     if type == 'group':
         favorite = FavoriserGroupe.query.filter_by(id_fest=current_user.id_fest, id_gr=id).first()
@@ -239,12 +243,12 @@ def add_to_favorites(type):
         new_favorite = FavoriserStyle(id_fest=current_user.id_fest, id_style=id)
         
     elif type == 'artist':
-        favorite = FavoriserArtiste.query.filter_by(id_fest=current_user.id_fest, id_artist=id).first()
+        favorite = FavoriserArtiste.query.filter_by(id_fest=current_user.id_fest, id_art=id).first()
 
         if favorite:
             return jsonify({'message': 'Artist already in favorites'}), 400
 
-        new_favorite = FavoriserArtiste(id_fest=current_user.id_fest, id_artist=id)
+        new_favorite = FavoriserArtiste(id_fest=current_user.id_fest, id_art=id)
     
     else:
         return jsonify({'message': 'Invalid type'}), 400
@@ -254,19 +258,23 @@ def add_to_favorites(type):
 
     return jsonify({'message': f'{type.capitalize()} added to favorites'}), 200
 
+
+
+
+
 @app.route('/favorites', methods=['GET'])
 @login_required
 def get_favorites():
-    # Get the user's favorite groups
     favorite_groups = FavoriserGroupe.query.filter_by(id_fest=current_user.id_fest).all()
     favorite_groups = [(Groupe.query.get(favorite.id_gr), 'group') for favorite in favorite_groups]
 
-    # Get the user's favorite styles
     favorite_styles = FavoriserStyle.query.filter_by(id_fest=current_user.id_fest).all()
     favorite_styles = [(StyleMusique.query.get(favorite.id_style), 'style') for favorite in favorite_styles]
 
-    # Combine the favorite groups and styles into one list
-    favorites = favorite_groups + favorite_styles
+    favorite_artists = FavoriserArtiste.query.filter_by(id_fest=current_user.id_fest).all()
+    favorite_artists = [(Artiste.query.get(favorite.id_art), 'artist') for favorite in favorite_artists]
+
+    favorites = favorite_groups + favorite_styles + favorite_artists
 
     return render_template('favori.html', favorites=favorites)
 
