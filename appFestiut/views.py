@@ -341,6 +341,7 @@ def get_page_groupe():
     
 @app.route('/add_group', methods=['GET','POST'])
 def add_group():
+    styles = StyleMusique.query.all()
     if request.method == 'POST':
         group_name = request.form.get('nom_gr')
         description_gr = request.form.get('description_gr')
@@ -351,7 +352,7 @@ def add_group():
 
         if existing_group:
             afficher_popup('Ce groupe existe déja.')
-            return render_template('ajoutGroupe.html')
+            return render_template('ajoutGroupe.html', styles=styles)
 
         new_group = Groupe(nom_gr=group_name, description_gr=description_gr, reseaux_gr=reseau_gr, id_style=style_id)
         db.session.add(new_group)
@@ -359,3 +360,65 @@ def add_group():
 
         afficher_popup('Groupe ajouté.')
         return render_template('ajoutGroupe.html')
+
+
+@app.route('/ajout_activite', methods=['GET','POST'])
+def get_page_activite():
+    lieu = Lieu.query.all()
+    type_acti = TypeActiviteAnnexe.query.all()
+    return render_template('ajoutActivite.html', lieu=lieu, type_acti=type_acti)
+
+
+from datetime import datetime
+@app.route('/add_activity', methods=['GET','POST'])
+def add_activity():
+    lieu = Lieu.query.all()
+    type_acti = TypeActiviteAnnexe.query.all()
+    if request.method == 'POST':
+        description_act_ann = request.form.get('description_act_ann')
+        date_debut_act_ann = datetime.strptime(request.form.get('date_debut_act_ann'), '%Y-%m-%dT%H:%M')
+        date_fin_act_ann = datetime.strptime(request.form.get('date_fin_act_ann'), '%Y-%m-%dT%H:%M')
+        id_type_act_ann = request.form.get('id_type_act_ann')
+        id_lieu = request.form.get('id_lieu')
+
+        if date_debut_act_ann >= date_fin_act_ann:
+            afficher_popup('La date de début doit être inférieure à la date de fin.')
+            return render_template('ajoutActivite.html', lieu=lieu, type_acti=type_acti)
+
+        new_activity = ActiviteAnnexe(description_act_ann=description_act_ann, date_debut_act_ann=date_debut_act_ann, date_fin_act_ann=date_fin_act_ann, id_type_act_ann=id_type_act_ann, id_lieu=id_lieu)
+        db.session.add(new_activity)
+        db.session.commit()
+
+        afficher_popup('Activité ajoutée.')
+        return render_template('ajoutActivite.html')
+    
+@app.route('/ajout_concert', methods=['GET','POST'])
+def get_page_concert():
+    lieu = Lieu.query.all()
+    groupe = Groupe.query.all()
+    return render_template('ajoutConcert.html', lieu=lieu, groupe=groupe)
+
+@app.route('/add_concert', methods=['GET','POST'])
+def add_concert():
+    lieu = Lieu.query.all()
+    groupe = Groupe.query.all()
+    if request.method == 'POST':
+        date_debut_concert = datetime.strptime(request.form.get('date_debut_concert'), '%Y-%m-%dT%H:%M')
+        date_fin_concert = datetime.strptime(request.form.get('date_fin_concert'), '%Y-%m-%dT%H:%M')
+        duree_montage = int(request.form.get('duree_montage'))
+        duree_demontage = int(request.form.get('duree_demontage'))
+        id_gr = request.form.get('id_gr')
+        id_lieu = request.form.get('id_lieu')
+
+        if date_debut_concert >= date_fin_concert:
+            afficher_popup('La date de début doit être inférieure à la date de fin.')
+            return render_template('ajoutConcert.html', lieu=lieu, groupe=groupe)
+
+        new_concert = Concert(date_debut_concert=date_debut_concert, date_fin_concert=date_fin_concert, duree_montage=duree_montage, duree_demontage=duree_demontage, id_gr=id_gr, id_lieu=id_lieu)
+        db.session.add(new_concert)
+        db.session.commit()
+
+        afficher_popup('Concert ajouté.')
+        return render_template('ajoutConcert.html', lieu=lieu, groupe=groupe)
+
+

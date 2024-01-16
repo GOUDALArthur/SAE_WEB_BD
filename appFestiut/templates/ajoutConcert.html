@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{url_for('static', filename='ajout.css')}}">
+{% endblock %}
+{% block content %}
+<div class="content">
+    <h1>Ajout Concert</h1>
+    <form action="{{ url_for('add_concert') }}" method="post">
+
+        <label for="date_debut_concert">Date de début:</label><br>
+        <input type="datetime-local" id="date_debut_concert" name="date_debut_concert" required><br>
+
+        <label for="date_fin_concert">Date de fin:</label><br>
+        <input type="datetime-local" id="date_fin_concert" name="date_fin_concert" required><br>
+
+        <label for="duree_montage">Durée de montage du matériel:</label><br>
+        <input type="number" id="duree_montage" name="duree_montage" required><br>
+
+        <label for="duree_demontage">Durée de démontage du matériel:</label><br>
+        <input type="number" id="duree_demontage" name="duree_demontage" required><br>
+
+        <label for="id_gr">Groupe:</label><br>
+        <select id="id_gr" name="id_gr" required>
+            {% for g in groupe %}
+            <option value="{{ g.id_gr }}">{{ g.nom_gr }}</option>
+            {% endfor %}
+        </select><br>
+
+        <label for="id_lieu">Lieu:</label><br>
+        <select id="id_lieu" name="id_lieu" required>
+            {% for l in lieu %}
+            <option value="{{ l.id_lieu }}">{{ l.lieu }}</option>
+            {% endfor %}
+        </select><br>
+
+        <input type="submit" value="Ajouter">
+    </form>
+</div>
+{% endblock %}

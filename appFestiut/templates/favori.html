@@ -4,23 +4,66 @@
 
 <div id="favorites">
   <h1>Mes favoris</h1>
-  <div class="favorite">
+
+  <h2>Groupes favoris</h2>
+  <table>
+    <tr>
+      <th>Nom</th>
+      <th>Action</th>
+    </tr>
     {% for favorite, type in favorites %}
       {% if type == 'group' %}
-        <form method="POST" action="{{ url_for('remove_favorite', favorite_id=favorite.id_gr, type='group') }}">
-          <button type="submit">{{ favorite.nom_gr }}</button>
-        </form>
-      {% elif type == 'style' %}
-        <form method="POST" action="{{ url_for('remove_favorite', favorite_id=favorite.id_style, type='style') }}">
-          <button type="submit">{{ favorite.style }}</button>
-        </form>
-      {% elif type == 'artist' %}
-        <form method="POST" action="{{ url_for('remove_favorite', favorite_id=favorite.id_art, type='artist') }}">
-          <button type="submit">{{ favorite.nom_art }}</button>
-        </form>
+        <tr>
+          <td>{{ favorite.nom_gr }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('remove_favorite', favorite_id=favorite.id_gr, type='group') }}">
+              <button type="submit">Retirer</button>
+            </form>
+          </td>
+        </tr>
       {% endif %}
     {% endfor %}
-  </div>
+  </table>
+
+  <h2>Styles favoris</h2>
+  <table>
+    <tr>
+      <th>Nom</th>
+      <th>Action</th>
+    </tr>
+    {% for favorite, type in favorites %}
+      {% if type == 'style' %}
+        <tr>
+          <td>{{ favorite.style }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('remove_favorite', favorite_id=favorite.id_style, type='style') }}">
+              <button type="submit">Retirer</button>
+            </form>
+          </td>
+        </tr>
+      {% endif %}
+    {% endfor %}
+  </table>
+
+  <h2>Artistes favoris</h2>
+  <table>
+    <tr>
+      <th>Nom</th>
+      <th>Action</th>
+    </tr>
+    {% for favorite, type in favorites %}
+      {% if type == 'artist' %}
+        <tr>
+          <td>{{ favorite.nom_art }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('remove_favorite', favorite_id=favorite.id_art, type='artist') }}">
+              <button type="submit">Retirer</button>
+            </form>
+          </td>
+        </tr>
+      {% endif %}
+    {% endfor %}
+  </table>
 </div>
 
 {% endblock content %}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{url_for('static', filename='ajout.css')}}">
+{% endblock %}
+{% block content %}
+<div class="content">
+    <h1>Ajout Activité</h1>
+    <form action="{{ url_for('add_activity') }}" method="post">
+
+        <label for="description_act_ann">Description:</label><br>
+        <input type="text" id="description_act_ann" name="description_act_ann" required><br>
+
+        <label for="date_debut_act_ann">Date de début:</label><br>
+        <input type="datetime-local" id="date_debut_act_ann" name="date_debut_act_ann" required><br>
+
+        <label for="date_fin_act_ann">Date de fin:</label><br>
+        <input type="datetime-local" id="date_fin_act_ann" name="date_fin_act_ann" required><br>
+
+        <label for="id_type_act_ann">Type d'activité:</label><br>
+        <select id="id_type_act_ann" name="id_type_act_ann" required>
+            {% for type in type_acti %}
+            <option value="{{ type.id_type_act_ann }}">{{ type.activite }}</option>
+            {% endfor %}
+        </select><br>
+
+        <label for="id_lieu">Lieu:</label><br>
+        <select id="id_lieu" name="id_lieu" required>
+            {% for l in lieu %}
+            <option value="{{ l.id_lieu }}">{{ l.lieu }}</option>
+            {% endfor %}
+        </select><br>
+
+        <input type="submit" value="Ajouter">
+    </form>
+</div>
+{% endblock %}

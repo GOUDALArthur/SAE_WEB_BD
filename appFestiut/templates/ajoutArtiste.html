@@ -5,7 +5,7 @@
 {% endblock %}
 {% block content %}
 <div class="content">
-    <h1>Add Artist</h1>
+    <h1>Ajout Artiste</h1>
     <form action="{{ url_for('add_artist') }}" method="post">
         <label for="nom_art">Nom de l'artiste:</label><br>
         <input type="text" id="nom_art" name="nom_art" required><br>
@@ -13,3 +13,4 @@
     </form>
 </div>
 {% endblock %}
+

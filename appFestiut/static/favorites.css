@@ -1,28 +1,48 @@
-body {
-    font-family: Arial, sans-serif;
-}
-
-#favorites {
-    width: 80%;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-#favorites h1 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 30px;
-}
-
-.favorite {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    padding: 20px;
+table {
+    width: 50%;
+    border-collapse: collapse;
     margin-bottom: 20px;
-    border-radius: 5px;
 }
 
-.favorite p {
-    margin: 0;
-    color: #333;
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    text-align: left;
+    padding: 8px;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+th:nth-child(1), td:nth-child(2) {
+    width: 90px;  /* Ajustez cette valeur selon vos besoins */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
 }
