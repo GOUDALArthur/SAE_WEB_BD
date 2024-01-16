@@ -12,6 +12,9 @@ def syncdb():
     """Create all missing tables"""
     db.create_all()
 
+    user = Festivalier(id_fest=0, prenom_fest="ad", nom_fest="ad", mail_fest="admin@gmail.com", mdp_fest=sha256("admin".encode()).hexdigest(), num_fest="982732837")    
+    db.session.add(user)
+
     user1 = Festivalier(id_fest=1, prenom_fest="Karim", nom_fest="Poulet", mail_fest="b@gmail.com", 
                         mdp_fest=sha256("b".encode()).hexdigest(), num_fest="982732837")
     db.session.add(user1)
