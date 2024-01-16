@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="{{url_for('static', filename='confirmation_billet.css')}}">
+    <h1>Confirmation d'achat</h1>
+    <p>Veuillez entrer vos détails et effectuer le paiement à l'adresse crypto ci-dessous</p>
+    <div id="formulaire">
+    <form action="{{ url_for('payer_billet') }}" method="post">
+        <label for="nom">Nom:</label>
+        <input type="text" id="nom" name="nom" required>
+
+        <label for="prenom">Prénom:</label>
+        <input type="text" id="prenom" name="prenom" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="tel">Numéro de téléphone:</label>
+        <input type="tel" id="tel" name="tel" required>
+
+        <label for="tel">Adresse BTC</label>
+        <input type="text" id="btc" name="btc" required>
+
+        <input type="submit" value="Confirmer l'achat">
+    </form>
+    </div>
+{% endblock %}
