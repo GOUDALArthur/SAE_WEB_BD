@@ -260,11 +260,7 @@ def add_to_favorites():
 
 
 
-
-
-@app.route('/favorites', methods=['GET'])
-@login_required
-def get_favorites():
+def avoir_favorites():
     favorite_groups = FavoriserGroupe.query.filter_by(id_fest=current_user.id_fest).all()
     favorite_groups = [(Groupe.query.get(favorite.id_gr), 'group') for favorite in favorite_groups]
 
@@ -276,6 +272,33 @@ def get_favorites():
 
     favorites = favorite_groups + favorite_styles + favorite_artists
 
+    return favorites
+
+@app.route('/favorites', methods=['GET'])
+@login_required
+def get_favorites():
+    favorites = avoir_favorites()
     return render_template('favori.html', favorites=favorites)
 
+@app.route('/remove_favorite/<int:favorite_id>', methods=['POST'])
+@login_required
+def remove_favorite(favorite_id):
+    favorite_type = request.args.get('type')
+
+    print(favorite_type)
+    print(favorite_id)
+
+    if favorite_type == 'group':
+        favorite = FavoriserGroupe.query.get((current_user.id_fest, favorite_id))
+    elif favorite_type == 'style':
+        favorite = FavoriserStyle.query.get((current_user.id_fest, favorite_id))
+    elif favorite_type == 'artist':
+        favorite = FavoriserArtiste.query.get((current_user.id_fest, favorite_id))
+
+    if favorite:
+        db.session.delete(favorite)
+        db.session.commit()
+
+    favorites = avoir_favorites()
+    return render_template('favori.html', favorites=favorites)
 

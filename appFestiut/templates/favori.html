@@ -5,27 +5,21 @@
 <div id="favorites">
   <h1>Mes favoris</h1>
   <div class="favorite">
-    <p>Groupe : 
-      {% for favorite, type in favorites %}
-        {% if type == 'group' %}
-          {{ favorite.nom_gr }},
-        {% endif %}
-      {% endfor %}
-    </p>
-    <p>Style de musique : 
-      {% for favorite, type in favorites %}
-        {% if type == 'style' %}
-          {{ favorite.style }},
-        {% endif %}
-      {% endfor %}
-    </p>
-    <p>Artiste : 
-      {% for favorite, type in favorites %}
-        {% if type == 'artist' %}
-          {{ favorite.nom_art }},
-        {% endif %}
-      {% endfor %}
-    </p>
+    {% for favorite, type in favorites %}
+      {% if type == 'group' %}
+        <form method="POST" action="{{ url_for('remove_favorite', favorite_id=favorite.id_gr, type='group') }}">
+          <button type="submit">{{ favorite.nom_gr }}</button>
+        </form>
+      {% elif type == 'style' %}
+        <form method="POST" action="{{ url_for('remove_favorite', favorite_id=favorite.id_style, type='style') }}">
+          <button type="submit">{{ favorite.style }}</button>
+        </form>
+      {% elif type == 'artist' %}
+        <form method="POST" action="{{ url_for('remove_favorite', favorite_id=favorite.id_art, type='artist') }}">
+          <button type="submit">{{ favorite.nom_art }}</button>
+        </form>
+      {% endif %}
+    {% endfor %}
   </div>
 </div>
 
