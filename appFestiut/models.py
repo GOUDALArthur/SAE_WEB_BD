@@ -239,10 +239,12 @@ class StyleMusique(db.Model):
     __tablename__ = 'style_musique'
     __table_args__ = (
         PrimaryKeyConstraint('id_style'),
+        ForeignKeyConstraint(['id_type'], ['type_musique.id_type'])
     )
 
     id_style = db.Column(db.Integer)
     style = db.Column(db.String(30), nullable=False)
+    id_type = db.Column(db.Integer, nullable=False)
     groupes = db.relationship('GroupeStyleAssociation', back_populates='style')
 
     def get_name(self):
