@@ -127,18 +127,24 @@ class Photo(db.Model):
     id_gr = db.Column(db.Integer, nullable=False)
     photo = db.Column(db.BLOB)
 
+class GroupeStyleAssociation(db.Model):
+    __tablename__ = 'groupe_style_association'
+    id_groupe = db.Column(db.Integer, db.ForeignKey('groupe.id_gr'), primary_key=True)
+    id_style = db.Column(db.Integer, db.ForeignKey('style_musique.id_style'), primary_key=True)
+    groupe = db.relationship('Groupe', back_populates='styles')
+    style = db.relationship('StyleMusique', back_populates='groupes')
+
 class Groupe(db.Model):
     __tablename__ = 'groupe'
     __table_args__ = (
         PrimaryKeyConstraint('id_gr'),
-        ForeignKeyConstraint(['id_style'], ['style_musique.id_style'])
     )
 
     id_gr = db.Column(db.Integer)
     nom_gr = db.Column(db.String(500), nullable=False)
     description_gr = db.Column(db.String(500))
     reseaux_gr = db.Column(db.String(500))
-    id_style = db.Column(db.Integer, nullable=False)
+    styles = db.relationship('GroupeStyleAssociation', back_populates='groupe')
 
 class Hebergement(db.Model):
     __tablename__ = 'hebergement'
@@ -235,12 +241,11 @@ class StyleMusique(db.Model):
     __tablename__ = 'style_musique'
     __table_args__ = (
         PrimaryKeyConstraint('id_style'),
-        ForeignKeyConstraint(['id_type'], ['type_musique.id_type'])
     )
 
     id_style = db.Column(db.Integer)
     style = db.Column(db.String(30), nullable=False)
-    id_type = db.Column(db.Integer, nullable=False)
+    groupes = db.relationship('GroupeStyleAssociation', back_populates='style')
 
 class TypeActiviteAnnexe(db.Model):
     __tablename__ = 'type_activite_annexe'
