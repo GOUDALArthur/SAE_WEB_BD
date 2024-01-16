@@ -28,6 +28,9 @@ def syncdb():
     style2 = StyleMusique(id_style=2, style="electro", id_type=1)
     db.session.add(style2)
 
+    group = Groupe(id_gr=0, nom_gr="solo", description_gr="A rock band", reseaux_gr="www.therockers.com", id_style=1)
+    db.session.add(group)
+
     group1 = Groupe(id_gr=1, nom_gr="The Rockers", description_gr="A rock band", reseaux_gr="www.therockers.com", id_style=1)
     db.session.add(group1)
 

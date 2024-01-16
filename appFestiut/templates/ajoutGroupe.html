@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{url_for('static', filename='ajout.css')}}">
+{% endblock %}
+{% block content %}
+<div class="content">
+    <h1>Creer un groupe</h1>
+    <form action="{{ url_for('add_group') }}" method="post">
+        <label for="nom_gr">Nom du groupe:</label><br>
+        <input type="text" id="nom_gr" name="nom_gr" required><br>
+
+        <label for="description_gr">Description du groupe</label><br>
+        <input type="text" id="description_gr" name="description_gr" required><br>
+
+        <label for="reseau_gr">Réseau du groupe</label><br>
+        <input type="text" id="reseau_gr" name="reseau_gr" required><br>
+
+        <label for="style">Style de musique:</label><br>
+        <select id="style" name="style">
+            {% for style in styles %}
+            <option value="{{ style.id_style }}">{{ style.style }}</option>
+            {% endfor %}
+        </select><br>
+
+        <input type="submit" value="Ajouter">
+    </form>
+</div>
+{% endblock %}

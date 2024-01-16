@@ -312,3 +312,50 @@ def remove_favorite(favorite_id):
     favorites = avoir_favorites()
     return render_template('favori.html', favorites=favorites)
 
+@app.route('/ajout_artiste', methods=['GET','POST'])
+def get_page_artiste():
+    return render_template('ajoutArtiste.html')
+
+@app.route('/add_artist', methods=['GET','POST'])
+def add_artist():
+    artist_name = request.form.get('nom_art')
+
+    existing_artist = Artiste.query.filter_by(nom_art=artist_name).first()
+    if existing_artist:
+        afficher_popup('Cet artiste existe déja.')
+        return render_template('ajoutArtiste.html')
+
+
+    new_artist = Artiste(nom_art=artist_name, id_gr=0)
+    db.session.add(new_artist)
+    db.session.commit()
+
+    afficher_popup('Artiste ajouté.')
+    return render_template('ajoutArtiste.html')
+
+@app.route('/ajout_groupe', methods=['GET','POST'])
+def get_page_groupe():
+    styles = StyleMusique.query.all()
+    return render_template('ajoutGroupe.html', styles=styles)
+
+    
+@app.route('/add_group', methods=['GET','POST'])
+def add_group():
+    if request.method == 'POST':
+        group_name = request.form.get('nom_gr')
+        description_gr = request.form.get('description_gr')
+        reseau_gr = request.form.get('reseau_gr')
+        style_id = request.form.get('style')
+
+        existing_group = Groupe.query.filter_by(nom_gr=group_name).first()
+
+        if existing_group:
+            afficher_popup('Ce groupe existe déja.')
+            return render_template('ajoutGroupe.html')
+
+        new_group = Groupe(nom_gr=group_name, description_gr=description_gr, reseaux_gr=reseau_gr, id_style=style_id)
+        db.session.add(new_group)
+        db.session.commit()
+
+        afficher_popup('Groupe ajouté.')
+        return render_template('ajoutGroupe.html')

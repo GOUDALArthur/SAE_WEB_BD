@@ -21,9 +21,14 @@
       <header id="header">
         <!-- Fixed navbar -->
         <ul class="liens">
+
             <li id="pageaccueil">
                 <a href="{{ url_for('home') }}">Accueil</a>
             </li>
+
+            {% if not current_user.is_authenticated or current_user.id_fest >= 1 %}
+
+            
 
             <li id="pageaccueil">
                 <a href="{{ url_for('home') }}">Planning</a>
@@ -36,6 +41,8 @@
             <li id="pageinfos">
                 <a href ="#">Informations générales</a>
             </li>
+
+            {% endif %}
 
             {% if not current_user.is_authenticated %}
 
@@ -50,7 +57,7 @@
 
             {% endif %}
 
-            {% if current_user.is_authenticated %}
+            {% if current_user.is_authenticated and current_user.id_fest >= 1  %}
 
             <li id="connection">
                 <a href ="{{ url_for('get_favorites')}}">Mes favoris</a>
@@ -71,6 +78,31 @@
             
 
             {% endif %}
+
+            {% if current_user.id_fest == 0 %}
+
+
+            <li id="connection">
+                <a href ="{{ url_for('get_page_artiste')}}">Ajout Artiste</a>
+            </li>
+
+            <li id="connection">
+                <a href ="{{ url_for('logout')}}">Ajout Style</a>
+            </li>
+
+            <li id="connection">
+                <a href ="{{ url_for('get_page_groupe')}}">Ajout Groupe</a>
+            </li>
+
+            <li id="connection">
+                <a href ="{{ url_for('logout')}}">Déconnection</a>
+            </li>
+
+
+
+            {% endif %}
+
+
 
 
             <li id="search">
