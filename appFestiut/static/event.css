@@ -1,0 +1,15 @@
+.event-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start; /* align items to the left */
+}
+
+.event-block {
+  width: 300px;
+  height: 210px;
+  border-radius: 20px;
+  background-color: #f0f0f0;
+  padding: 20px;
+  margin: 5px; /* reduce margin */
+  box-sizing: border-box;
+}

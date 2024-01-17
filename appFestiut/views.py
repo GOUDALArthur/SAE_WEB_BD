@@ -380,6 +380,7 @@ def add_activity():
     lieu = Lieu.query.all()
     type_acti = TypeActiviteAnnexe.query.all()
     if request.method == 'POST':
+        titre_act_ann = request.form.get('titre_act_ann')
         description_act_ann = request.form.get('description_act_ann')
         date_debut_act_ann = datetime.strptime(request.form.get('date_debut_act_ann'), '%Y-%m-%dT%H:%M')
         date_fin_act_ann = datetime.strptime(request.form.get('date_fin_act_ann'), '%Y-%m-%dT%H:%M')
@@ -390,12 +391,12 @@ def add_activity():
             afficher_popup('La date de début doit être inférieure à la date de fin.')
             return render_template('ajoutActivite.html', lieu=lieu, type_acti=type_acti)
 
-        new_activity = ActiviteAnnexe(description_act_ann=description_act_ann, date_debut_act_ann=date_debut_act_ann, date_fin_act_ann=date_fin_act_ann, id_type_act_ann=id_type_act_ann, id_lieu=id_lieu)
+        new_activity = ActiviteAnnexe(titre_act_ann=titre_act_ann,description_act_ann=description_act_ann, date_debut_act_ann=date_debut_act_ann, date_fin_act_ann=date_fin_act_ann, id_type_act_ann=id_type_act_ann, id_lieu=id_lieu)
         db.session.add(new_activity)
         db.session.commit()
 
         afficher_popup('Activité ajoutée.')
-        return render_template('ajoutActivite.html')
+        return render_template('ajoutActivite.html', lieu=lieu, type_acti=type_acti)
     
 @app.route('/ajout_concert', methods=['GET','POST'])
 def get_page_concert():
@@ -426,4 +427,32 @@ def add_concert():
         afficher_popup('Concert ajouté.')
         return render_template('ajoutConcert.html', lieu=lieu, groupe=groupe)
 
+
+from datetime import datetime
+from flask import render_template
+from .models import Concert, ActiviteAnnexe
+
+@app.route('/voir_prochain', methods=['GET','POST'])
+def get_prochain_page():
+    concerts = Concert.query.all()
+    activities = ActiviteAnnexe.query.all()
+    
+    print(concerts)
+    print(activities)
+    return render_template('voir_prochain.html', concerts=concerts, activities=activities)
+
+
+@app.context_processor
+def utility_processor():
+    def get_lieu_by_id(id_lieu):
+        lieu = Lieu.query.get(id_lieu)
+        return lieu.lieu if lieu else None
+    return dict(get_lieu_by_id=get_lieu_by_id)
+
+@app.context_processor
+def utility_processor():
+    def get_groupe_by_id(id_g):
+        groupe = Groupe.query.get(id_g)
+        return groupe.nom_gr if groupe else None
+    return dict(get_groupe_by_id=get_groupe_by_id)
 
