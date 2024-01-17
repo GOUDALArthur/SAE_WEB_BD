@@ -10,7 +10,8 @@ from flask_wtf import FlaskForm
 from hashlib import sha256
 from .models import *
 from flask import request, flash
-from datetime import timedelta
+from datetime import timedelta , datetime
+
 
 
 
@@ -341,12 +342,12 @@ def get_page_groupe():
     
 @app.route('/add_group', methods=['GET','POST'])
 def add_group():
-    styles = StyleMusique.query.all()
-    if request.method == 'POST':
+        styles = db.session.query(StyleMusique, TypeMusique).join(TypeMusique, StyleMusique.id_type == TypeMusique.id_type).all()
         group_name = request.form.get('nom_gr')
         description_gr = request.form.get('description_gr')
         reseau_gr = request.form.get('reseau_gr')
-        style_id = request.form.get('style')
+        style_id = request.form.getlist('style')
+        print(style_id)
 
         existing_group = Groupe.query.filter_by(nom_gr=group_name).first()
 
@@ -354,12 +355,17 @@ def add_group():
             afficher_popup('Ce groupe existe déja.')
             return render_template('ajoutGroupe.html', styles=styles)
 
-        new_group = Groupe(nom_gr=group_name, description_gr=description_gr, reseaux_gr=reseau_gr, id_style=style_id)
+        new_group = Groupe(nom_gr=group_name, description_gr=description_gr, reseaux_gr=reseau_gr)
+        
         db.session.add(new_group)
         db.session.commit()
+        for style_ids in style_id:
+            asso_style = GroupeStyleAssociation(id_groupe=new_group.id_gr, id_style=style_ids)
+            db.session.add(asso_style)
+            db.session.commit()
 
         afficher_popup('Groupe ajouté.')
-        return render_template('ajoutGroupe.html')
+        return render_template('ajoutGroupe.html', styles=styles)
 
 
 @app.route('/ajout_activite', methods=['GET','POST'])
@@ -369,7 +375,6 @@ def get_page_activite():
     return render_template('ajoutActivite.html', lieu=lieu, type_acti=type_acti)
 
 
-from datetime import datetime
 @app.route('/add_activity', methods=['GET','POST'])
 def add_activity():
     lieu = Lieu.query.all()

@@ -17,9 +17,9 @@
         <input type="text" id="reseau_gr" name="reseau_gr" required><br>
 
         <label for="style">Style de musique:</label><br>
-        <select id="style" name="style">
-            {% for style in styles %}
-            <option value="{{ style.id_style }}">{{ style.style }}</option>
+        <select id="style" name="style" multiple>
+            {% for style, type in styles %}
+            <option value="{{ style.id_style }}">{{ type.type }} : {{ style.style }} </option>
             {% endfor %}
         </select><br>
 
