@@ -27,6 +27,13 @@
             {% endfor %}
         </select><br>
 
+        <label for="id_gr">Groupe:</label><br>
+        <select id="id_gr" name="id_gr" required>
+            {% for g in groupe %}
+            <option value="{{ g.id_gr }}">{{ g.nom_gr }}</option>
+            {% endfor %}
+        </select><br>
+
         <label for="id_lieu">Lieu:</label><br>
         <select id="id_lieu" name="id_lieu" required>
             {% for l in lieu %}
