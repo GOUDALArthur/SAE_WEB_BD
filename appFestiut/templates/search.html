@@ -7,8 +7,8 @@
     {% if results %}
     {% for result in results %}
     <div class="search-result">
-        <h2>{{ result.nom_gr or result.style or result.nom_art}} 
-            <button class="favorite-button" data-id="{{ result.id_gr if result.nom_gr else result.id_style if result.style else result.id_art }}" data-type="{{ 'group' if result.nom_gr else 'style' if result.style else 'artist' }}">Favoris</button>    </div>
+        <h2>{{ result.nom_gr }} 
+            <button class="favorite-button" data-id="{{ result.id_gr }}" data-type="{{ result.nom_gr}}">Favoris</button>    </div>
 {% endfor %}
     {% else %}
         <p>Pas de résultat trouve pour "{{ search_term }}".</p>

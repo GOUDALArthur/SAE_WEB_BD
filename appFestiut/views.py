@@ -154,7 +154,10 @@ def creer_user():
             return render_template("register.html", form=form)
         
         password_hash = sha256(form.password.data.encode()).hexdigest()
-        new_personne = Festivalier(mail_fest=form.mail.data,mdp_fest=password_hash,nom_fest=form.nom.data,prenom_fest=form.prenom.data,num_fest=form.num.data)
+        fest_id_max = Festivalier.query.order_by(Festivalier.id_fest.desc()).first()
+        id_suivant = int(fest_id_max.id_fest) + 1
+        print(type(id_suivant))
+        new_personne = Festivalier(id_fest=str(id_suivant), mail_fest=form.mail.data,mdp_fest=password_hash,nom_fest=form.nom.data,prenom_fest=form.prenom.data,num_fest=form.num.data)
 
         try:
             
@@ -224,10 +227,8 @@ def search():
     search_term = request.form.get('searched')
 
     groupes = Groupe.query.filter(Groupe.nom_gr.contains(search_term)).all()
-    artistes = Artiste.query.filter(Artiste.nom_art.contains(search_term)).all()
-    styles = StyleMusique.query.filter(StyleMusique.style.contains(search_term)).all()
 
-    results = groupes + artistes + styles
+    results = groupes
 
     return render_template('search.html', results=results, search_term=search_term)
 
@@ -239,32 +240,10 @@ def add_to_favorites():
     print(type)
     print(id)
 
-    if type == 'group':
-        favorite = FavoriserGroupe.query.filter_by(id_fest=current_user.id_fest, id_gr=id).first()
-
-        if favorite:
-            return jsonify({'message': 'Group already in favorites'}), 400
-
-        new_favorite = FavoriserGroupe(id_fest=current_user.id_fest, id_gr=id)
-    elif type == 'style':
-        favorite = FavoriserStyle.query.filter_by(id_fest=current_user.id_fest, id_style=id).first()
-
-        if favorite:
-            return jsonify({'message': 'Style already in favorites'}), 400
-
-        new_favorite = FavoriserStyle(id_fest=current_user.id_fest, id_style=id)
-        
-    elif type == 'artist':
-        favorite = FavoriserArtiste.query.filter_by(id_fest=current_user.id_fest, id_art=id).first()
-
-        if favorite:
-            return jsonify({'message': 'Artist already in favorites'}), 400
-
-        new_favorite = FavoriserArtiste(id_fest=current_user.id_fest, id_art=id)
-    
-    else:
-        return jsonify({'message': 'Invalid type'}), 400
-
+    favorite = FavoriserGroupe.query.filter_by(id_fest=current_user.id_fest, id_gr=id).first()
+    if favorite:
+        return jsonify({'message': 'Artist already in favorites'}), 400
+    new_favorite = FavoriserArtiste(id_fest=current_user.id_fest, id_art=id)
     db.session.add(new_favorite)
     db.session.commit()
 
