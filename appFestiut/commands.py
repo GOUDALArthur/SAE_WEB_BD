@@ -5,8 +5,6 @@ from hashlib import sha256
 from datetime import datetime
 
 
-
-
 @app.cli.command()
 def syncdb():
     """Create all missing tables"""
@@ -35,7 +33,7 @@ def syncdb():
     db.session.add(jouer1)
 
     act1 = ActiviteAnnexe(id_act_ann=1, description_act_ann="Fun activity", date_debut_act_ann=datetime.now(), 
-                          date_fin_act_ann=datetime.now(), id_type_act_ann=1, id_lieu=1)
+                          date_fin_act_ann=datetime.now(), id_type_act_ann=1, id_lieu=1, id_gr=19)
     db.session.add(act1)
 
     type_act1 = TypeActiviteAnnexe(id_type_act_ann=1, activite="Music")
@@ -184,7 +182,5 @@ def syncdb():
     db.session.add(Artiste(id_art=21, nom_art="Wayne Sermon", id_gr=20))
     db.session.add(Artiste(id_art=22, nom_art="Ben McKee", id_gr=20))
     db.session.add(Artiste(id_art=23, nom_art="Daniel Platzman", id_gr=20))
-
-    db.session.commit()
 
     db.session.commit()

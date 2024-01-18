@@ -4,10 +4,6 @@ from sqlalchemy import PrimaryKeyConstraint, ForeignKeyConstraint
 from flask_login import UserMixin
 from .app import db, login_manager
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///festival.db'
-db = SQLAlchemy(app)
-
 class ActiviteAnnexe(db.Model):
     __tablename__ = 'activite_annexe'
     __table_args__ = (
@@ -285,10 +281,3 @@ class TypeMusique(db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return Festivalier.query.get(int(user_id))
-
-class GroupeStyleAssociation(db.Model):
-    __tablename__ = 'groupe_style_association'
-    id_groupe = db.Column(db.Integer, db.ForeignKey('groupe.id_gr'), primary_key=True)
-    id_style = db.Column(db.Integer, db.ForeignKey('style_musique.id_style'), primary_key=True)
-    groupe = db.relationship('Groupe', back_populates='styles')
-    style = db.relationship('StyleMusique', back_populates='groupes')
