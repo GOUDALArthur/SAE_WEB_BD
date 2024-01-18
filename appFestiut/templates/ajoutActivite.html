@@ -8,6 +8,9 @@
     <h1>Ajout Activité</h1>
     <form action="{{ url_for('add_activity') }}" method="post">
 
+        <label for="titre_act_ann">Titre de l'activite:</label><br>
+        <input type="text" id="titre_act_ann" name="titre_act_ann" required><br>
+
         <label for="description_act_ann">Description:</label><br>
         <input type="text" id="description_act_ann" name="description_act_ann" required><br>
 

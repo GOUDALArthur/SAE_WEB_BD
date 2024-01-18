@@ -1,4 +1,6 @@
 from flask import Flask
+
+from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import PrimaryKeyConstraint, ForeignKeyConstraint
 from flask_login import UserMixin
@@ -9,11 +11,13 @@ class ActiviteAnnexe(db.Model):
     __table_args__ = (
         PrimaryKeyConstraint('id_act_ann'),
         ForeignKeyConstraint(['id_type_act_ann'], ['type_activite_annexe.id_type_act_ann']),
+
+        ForeignKeyConstraint(['id_lieu'], ['lieu.id_lieu']),
         ForeignKeyConstraint(['id_gr'], ['groupe.id_gr']),
-        ForeignKeyConstraint(['id_lieu'], ['lieu.id_lieu'])
     )
 
     id_act_ann = db.Column(db.Integer)
+    titre_act_ann = db.Column(db.String(500), nullable=False)
     description_act_ann = db.Column(db.String(500))
     date_debut_act_ann = db.Column(db.DateTime, nullable=False)
     date_fin_act_ann = db.Column(db.DateTime, nullable=False)

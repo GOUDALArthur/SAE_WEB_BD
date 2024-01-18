@@ -32,8 +32,9 @@ def syncdb():
     jouer1 = JouerInstru(id_art=1, id_instr=1)
     db.session.add(jouer1)
 
-    act1 = ActiviteAnnexe(id_act_ann=1, description_act_ann="Fun activity", date_debut_act_ann=datetime.now(), 
-                          date_fin_act_ann=datetime.now(), id_type_act_ann=1, id_lieu=1, id_gr=19)
+    act1 = ActiviteAnnexe(id_act_ann=1, titre_act_ann = "Visite du lac de Patate" ,  description_act_ann="Fun activity", date_debut_act_ann=datetime.now(), 
+                          date_fin_act_ann=datetime.now(), id_type_act_ann=1,id_gr=1, id_lieu=1)
+
     db.session.add(act1)
 
     type_act1 = TypeActiviteAnnexe(id_type_act_ann=1, activite="Music")
