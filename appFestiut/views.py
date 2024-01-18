@@ -11,7 +11,7 @@ from hashlib import sha256
 from .models import *
 from flask import request, flash
 from datetime import timedelta , datetime
-
+from sqlalchemy import desc
 
 
 
@@ -418,6 +418,107 @@ def add_concert():
         if date_debut_concert >= date_fin_concert:
             afficher_popup('La date de début doit être inférieure à la date de fin.')
             return render_template('ajoutConcert.html', lieu=lieu, groupe=groupe)
+        
+        # Vérification si le groupe est disponible pour assurer le concert
+        dernier_concert = (
+            Concert.query
+            .filter(Concert.id_gr == id_gr)
+            .filter(Concert.date_fin_concert <= date_debut_concert)
+            .order_by(Concert.date_fin_concert.desc())
+            .first()
+        )
+        prochain_concert = (
+            Concert.query
+            .filter(Concert.id_gr == id_gr)
+            .filter(Concert.date_debut_concert >= date_fin_concert)
+            .order_by(Concert.date_debut_concert)
+            .first()
+        )
+        derniere_act = (
+            ActiviteAnnexe.query
+            .filter(ActiviteAnnexe.id_gr == id_gr)
+            .filter(ActiviteAnnexe.date_fin_act_ann <= date_debut_concert)
+            .order_by(ActiviteAnnexe.date_fin_act_ann.desc())
+            .first()
+        )
+        prochaine_act = (
+            ActiviteAnnexe.query
+            .filter(ActiviteAnnexe.id_gr == id_gr)
+            .filter(ActiviteAnnexe.date_debut_act_ann >= date_fin_concert)
+            .order_by(ActiviteAnnexe.date_debut_act_ann)
+            .first()
+        )
+
+        if dernier_concert and derniere_act:
+            if dernier_concert.date_fin_concert < derniere_act.date_fin_act_ann:
+                dernier_concert = derniere_act
+        elif derniere_act:
+            dernier_concert = derniere_act
+
+        if prochain_concert and prochaine_act:
+            if prochain_concert.date_debut_concert > prochaine_act.date_debut_act_ann:
+                prochain_concert = prochaine_act
+        elif prochaine_act:
+            prochain_concert = prochaine_act
+        
+        if dernier_concert is not None:
+            dernier_trajet = (
+                Deplacer.query
+                .filter(Deplacer.id_lieu_depart == dernier_concert.id_lieu)
+                .filter(Deplacer.id_lieu_arrivee == id_lieu)
+                .first()
+            )
+            if dernier_trajet is None:   
+                dernier_trajet = (
+                    Deplacer.query
+                    .filter(Deplacer.id_lieu_arrivee == dernier_concert.id_lieu)
+                    .filter(Deplacer.id_lieu_depart == id_lieu)
+                    .first()
+                )
+            derniere_dispo = date_debut_concert - timedelta(minutes=dernier_trajet.temps_de_trajet) if dernier_trajet is not None else None
+
+        if prochain_concert is not None:
+            prochain_trajet = (
+                Deplacer.query
+                .filter(Deplacer.id_lieu_depart == prochain_concert.id_lieu)
+                .filter(Deplacer.id_lieu_arrivee == id_lieu)
+                .first()
+            )
+            if prochain_trajet is None:   
+                prochain_trajet = (
+                    Deplacer.query
+                    .filter(Deplacer.id_lieu_arrivee == prochain_concert.id_lieu)
+                    .filter(Deplacer.id_lieu_depart == id_lieu)
+                    .first()
+                )
+            prochaine_dispo = date_fin_concert + timedelta(minutes=prochain_trajet.temps_de_trajet) if prochain_trajet is not None else None
+        
+        if dernier_concert is not None and dernier_concert.date_fin_concert >= derniere_dispo or prochain_concert is not None and prochain_concert.date_debut_concert <= prochaine_dispo:
+            afficher_popup("Le groupe n'est pas disponible à ce moment.")
+            return render_template('ajoutConcert.html', lieu=lieu, groupe=groupe)
+        
+        # Vérification si le lieu est disponible pour accueillir le concert
+        dernier_concert = (
+            Concert.query
+            .filter(Concert.id_lieu == id_lieu)
+            .filter(Concert.date_fin_concert <= date_debut_concert)
+            .order_by(Concert.date_debut_concert.desc())
+            .first()
+        )
+        prochain_concert = (
+            Concert.query
+            .filter(Concert.id_lieu == id_lieu)
+            .filter(Concert.date_debut_concert >= date_fin_concert)
+            .order_by(Concert.date_debut_concert)
+            .first()
+        )
+        
+        derniere_dispo = date_debut_concert - timedelta(minutes=dernier_concert.duree_demontage) - timedelta(minutes=duree_montage) if dernier_concert is not None else None
+        prochaine_dispo = date_fin_concert + timedelta(minutes=prochain_concert.duree_montage) + timedelta(minutes=duree_demontage) if prochain_concert is not None else None
+        if dernier_concert is not None and dernier_concert.date_fin_concert >= derniere_dispo or prochain_concert is not None and prochain_concert.date_debut_concert <= prochaine_dispo:
+            afficher_popup("Le lieu n'est pas disponible à ce moment.")
+            return render_template('ajoutConcert.html', lieu=lieu, groupe=groupe)
+        
 
         new_concert = Concert(date_debut_concert=date_debut_concert, date_fin_concert=date_fin_concert, duree_montage=duree_montage, duree_demontage=duree_demontage, id_gr=id_gr, id_lieu=id_lieu)
         db.session.add(new_concert)

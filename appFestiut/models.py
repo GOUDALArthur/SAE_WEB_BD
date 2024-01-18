@@ -2,6 +2,7 @@ from flask import Flask
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import PrimaryKeyConstraint, ForeignKeyConstraint
+from flask_login import UserMixin
 from .app import db, login_manager
 
 class ActiviteAnnexe(db.Model):
@@ -9,6 +10,7 @@ class ActiviteAnnexe(db.Model):
     __table_args__ = (
         PrimaryKeyConstraint('id_act_ann'),
         ForeignKeyConstraint(['id_type_act_ann'], ['type_activite_annexe.id_type_act_ann']),
+        ForeignKeyConstraint(['id_gr'], ['groupe.id_gr']),
         ForeignKeyConstraint(['id_lieu'], ['lieu.id_lieu'])
     )
 
@@ -17,6 +19,7 @@ class ActiviteAnnexe(db.Model):
     date_debut_act_ann = db.Column(db.DateTime, nullable=False)
     date_fin_act_ann = db.Column(db.DateTime, nullable=False)
     id_type_act_ann = db.Column(db.Integer, nullable=False)
+    id_gr = db.Column(db.Integer, nullable=False)
     id_lieu = db.Column(db.Integer, nullable=False)
 
 class Artiste(db.Model):
@@ -90,13 +93,13 @@ class FavoriserStyle(db.Model):
     id_fest = db.Column(db.Integer, nullable=False)
     id_style = db.Column(db.Integer, nullable=False)
 
-class Festivalier(db.Model):
+class Festivalier(db.Model, UserMixin):
     __tablename__ = 'festivalier'
     __table_args__ = (
         PrimaryKeyConstraint('id_fest'),
     )
 
-    id_fest = db.Column(db.Integer)
+    id_fest = db.Column(db.String(10))
     prenom_fest = db.Column(db.String(20), nullable=False)
     nom_fest = db.Column(db.String(50), nullable=False)
     mail_fest = db.Column(db.String(50), nullable=False)
@@ -279,5 +282,3 @@ class GroupeStyleAssociation(db.Model):
     id_style = db.Column(db.Integer, db.ForeignKey('style_musique.id_style'), primary_key=True)
     groupe = db.relationship('Groupe', back_populates='styles')
     style = db.relationship('StyleMusique', back_populates='groupes')
-
-
