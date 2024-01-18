@@ -105,7 +105,7 @@ def enregistrement_billet():
         jours = int(request.form.get('jours'))
         id_proprietaire = int(request.form.get('id_proprietaire'))
 
-        billet = Billet(duree_val_bil=jours, id_proprietaire=id_proprietaire, date_achat_bil=datetime.datetime.now().date())
+        billet = Billet(duree_val_bil=jours, id_proprietaire=id_proprietaire, date_achat_bil=datetime.now().date())
 
         try:
             
@@ -236,14 +236,12 @@ def search():
 @app.route('/add_to_favorites', methods=['POST'])
 def add_to_favorites():
     id = request.form.get('id')
-    type = request.form.get('type')
-    print(type)
+    
     print(id)
 
     favorite = FavoriserGroupe.query.filter_by(id_fest=current_user.id_fest, id_gr=id).first()
-    if favorite:
-        return jsonify({'message': 'Artist already in favorites'}), 400
-    new_favorite = FavoriserArtiste(id_fest=current_user.id_fest, id_art=id)
+ 
+    new_favorite = FavoriserGroupe(id_fest=current_user.id_fest, id_gr=id)
     db.session.add(new_favorite)
     db.session.commit()
 
@@ -360,15 +358,18 @@ def add_group():
 @app.route('/ajout_activite', methods=['GET','POST'])
 def get_page_activite():
     lieu = Lieu.query.all()
+    groupe = Groupe.query.all()
     type_acti = TypeActiviteAnnexe.query.all()
-    return render_template('ajoutActivite.html', lieu=lieu, type_acti=type_acti)
+    return render_template('ajoutActivite.html', lieu=lieu, type_acti=type_acti, groupe=groupe)
 
 
 @app.route('/add_activity', methods=['GET','POST'])
 def add_activity():
     lieu = Lieu.query.all()
     type_acti = TypeActiviteAnnexe.query.all()
+    groupe = Groupe.query.all()
     if request.method == 'POST':
+        id_gr = request.form.get('id_gr')
         titre_act_ann = request.form.get('titre_act_ann')
         description_act_ann = request.form.get('description_act_ann')
         date_debut_act_ann = datetime.strptime(request.form.get('date_debut_act_ann'), '%Y-%m-%dT%H:%M')
@@ -378,14 +379,14 @@ def add_activity():
 
         if date_debut_act_ann >= date_fin_act_ann:
             afficher_popup('La date de début doit être inférieure à la date de fin.')
-            return render_template('ajoutActivite.html', lieu=lieu, type_acti=type_acti)
+            return render_template('ajoutActivite.html', lieu=lieu, type_acti=type_acti, groupe=groupe)
 
-        new_activity = ActiviteAnnexe(titre_act_ann=titre_act_ann,description_act_ann=description_act_ann, date_debut_act_ann=date_debut_act_ann, date_fin_act_ann=date_fin_act_ann, id_type_act_ann=id_type_act_ann, id_lieu=id_lieu)
+        new_activity = ActiviteAnnexe(titre_act_ann=titre_act_ann,description_act_ann=description_act_ann, date_debut_act_ann=date_debut_act_ann, date_fin_act_ann=date_fin_act_ann, id_type_act_ann=id_type_act_ann, id_lieu=id_lieu, id_gr=id_gr)
         db.session.add(new_activity)
         db.session.commit()
 
         afficher_popup('Activité ajoutée.')
-        return render_template('ajoutActivite.html', lieu=lieu, type_acti=type_acti)
+        return render_template('ajoutActivite.html', lieu=lieu, type_acti=type_acti, groupe=groupe)
     
 @app.route('/ajout_concert', methods=['GET','POST'])
 def get_page_concert():
