@@ -16,7 +16,6 @@ from sqlalchemy import desc
 
 
 
-
 @app.route("/")
 def home():
     if current_user.is_authenticated:
@@ -430,7 +429,7 @@ def add_concert():
         if date_debut_concert >= date_fin_concert:
             afficher_popup('La date de début doit être inférieure à la date de fin.')
             return render_template('ajoutConcert.html', lieu=lieu, groupe=groupe)
-                # Vérification si le groupe est disponible pour assurer le concert
+
         dernier_concert = (
             Concert.query
             .filter(Concert.id_gr == id_gr)
@@ -529,6 +528,7 @@ def add_concert():
         if dernier_concert is not None and dernier_concert.date_fin_concert >= derniere_dispo or prochain_concert is not None and prochain_concert.date_debut_concert <= prochaine_dispo:
             afficher_popup("Le lieu n'est pas disponible à ce moment.")
             return render_template('ajoutConcert.html', lieu=lieu, groupe=groupe)
+
 
         new_concert = Concert(date_debut_concert=date_debut_concert, date_fin_concert=date_fin_concert, duree_montage=duree_montage, duree_demontage=duree_demontage, id_gr=id_gr, id_lieu=id_lieu)
         db.session.add(new_concert)

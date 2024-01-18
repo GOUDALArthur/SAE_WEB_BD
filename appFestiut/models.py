@@ -1,8 +1,9 @@
 from flask import Flask
-from flask_login import UserMixin
 
+from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import PrimaryKeyConstraint, ForeignKeyConstraint
+from flask_login import UserMixin
 from .app import db, login_manager
 
 class ActiviteAnnexe(db.Model):
@@ -10,6 +11,7 @@ class ActiviteAnnexe(db.Model):
     __table_args__ = (
         PrimaryKeyConstraint('id_act_ann'),
         ForeignKeyConstraint(['id_type_act_ann'], ['type_activite_annexe.id_type_act_ann']),
+
         ForeignKeyConstraint(['id_lieu'], ['lieu.id_lieu']),
         ForeignKeyConstraint(['id_gr'], ['groupe.id_gr']),
     )
@@ -132,6 +134,13 @@ class Photo(db.Model):
     id_photo = db.Column(db.Integer)
     id_gr = db.Column(db.Integer, nullable=False)
     photo = db.Column(db.BLOB)
+
+class GroupeStyleAssociation(db.Model):
+    __tablename__ = 'groupe_style_association'
+    id_groupe = db.Column(db.Integer, db.ForeignKey('groupe.id_gr'), primary_key=True)
+    id_style = db.Column(db.Integer, db.ForeignKey('style_musique.id_style'), primary_key=True)
+    groupe = db.relationship('Groupe', back_populates='styles')
+    style = db.relationship('StyleMusique', back_populates='groupes')
 
 class Groupe(db.Model):
     __tablename__ = 'groupe'
@@ -276,12 +285,3 @@ class TypeMusique(db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return Festivalier.query.get(int(user_id))
-
-class GroupeStyleAssociation(db.Model):
-    __tablename__ = 'groupe_style_association'
-    id_groupe = db.Column(db.Integer, db.ForeignKey('groupe.id_gr'), primary_key=True)
-    id_style = db.Column(db.Integer, db.ForeignKey('style_musique.id_style'), primary_key=True)
-    groupe = db.relationship('Groupe', back_populates='styles')
-    style = db.relationship('StyleMusique', back_populates='groupes')
-
-
