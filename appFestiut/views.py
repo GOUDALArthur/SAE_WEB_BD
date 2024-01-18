@@ -227,10 +227,8 @@ def search():
     search_term = request.form.get('searched')
 
     groupes = Groupe.query.filter(Groupe.nom_gr.contains(search_term)).all()
-    artistes = Artiste.query.filter(Artiste.nom_art.contains(search_term)).all()
-    styles = StyleMusique.query.filter(StyleMusique.style.contains(search_term)).all()
 
-    results = groupes + artistes + styles
+    results = groupes
 
     return render_template('search.html', results=results, search_term=search_term)
 
@@ -242,32 +240,10 @@ def add_to_favorites():
     print(type)
     print(id)
 
-    if type == 'group':
-        favorite = FavoriserGroupe.query.filter_by(id_fest=current_user.id_fest, id_gr=id).first()
-
-        if favorite:
-            return jsonify({'message': 'Group already in favorites'}), 400
-
-        new_favorite = FavoriserGroupe(id_fest=current_user.id_fest, id_gr=id)
-    elif type == 'style':
-        favorite = FavoriserStyle.query.filter_by(id_fest=current_user.id_fest, id_style=id).first()
-
-        if favorite:
-            return jsonify({'message': 'Style already in favorites'}), 400
-
-        new_favorite = FavoriserStyle(id_fest=current_user.id_fest, id_style=id)
-        
-    elif type == 'artist':
-        favorite = FavoriserArtiste.query.filter_by(id_fest=current_user.id_fest, id_art=id).first()
-
-        if favorite:
-            return jsonify({'message': 'Artist already in favorites'}), 400
-
-        new_favorite = FavoriserArtiste(id_fest=current_user.id_fest, id_art=id)
-    
-    else:
-        return jsonify({'message': 'Invalid type'}), 400
-
+    favorite = FavoriserGroupe.query.filter_by(id_fest=current_user.id_fest, id_gr=id).first()
+    if favorite:
+        return jsonify({'message': 'Artist already in favorites'}), 400
+    new_favorite = FavoriserArtiste(id_fest=current_user.id_fest, id_art=id)
     db.session.add(new_favorite)
     db.session.commit()
 
