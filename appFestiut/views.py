@@ -154,7 +154,10 @@ def creer_user():
             return render_template("register.html", form=form)
         
         password_hash = sha256(form.password.data.encode()).hexdigest()
-        new_personne = Festivalier(mail_fest=form.mail.data,mdp_fest=password_hash,nom_fest=form.nom.data,prenom_fest=form.prenom.data,num_fest=form.num.data)
+        fest_id_max = Festivalier.query.order_by(Festivalier.id_fest.desc()).first()
+        id_suivant = int(fest_id_max.id_fest) + 1
+        print(type(id_suivant))
+        new_personne = Festivalier(id_fest=str(id_suivant), mail_fest=form.mail.data,mdp_fest=password_hash,nom_fest=form.nom.data,prenom_fest=form.prenom.data,num_fest=form.num.data)
 
         try:
             
