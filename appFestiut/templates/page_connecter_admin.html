@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{url_for('static', filename='home.css')}}">
+{% endblock %}
+{% block content %}
+<div class="content">
+    <h1>Festiut'O</h1>
+    <p>Bienvenue {{ current_user.prenom_fest }} {{ current_user.nom_fest }},</p>
+    <p>Votre mail est : {{ current_user.mail_fest }}</p>
+    <p>Festiut'O, le festival de musique ultime qui rassemble les meilleurs artistes de tous les genres.
+        Préparez-vous à vivre trois jours de musique ininterrompue, de nourriture délicieuse et d'activités amusantes.
+        Rejoignez-nous pour célébrer la musique, l'amour et la vie. Ne manquez pas cette occasion unique de créer des souvenirs inoubliables !</p>
+</div>
+{% endblock %}

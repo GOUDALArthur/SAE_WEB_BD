@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{url_for('static', filename='ajout.css')}}">
+{% endblock %}
+{% block content %}
+<div class="content">
+    <h1>Ajout Artiste</h1>
+    <form action="{{ url_for('add_artist') }}" method="post">
+        <label for="nom_art">Nom de l'artiste:</label><br>
+        <input type="text" id="nom_art" name="nom_art" required><br>
+        <input type="submit" value="Ajouter">
+    </form>
+</div>
+{% endblock %}
+

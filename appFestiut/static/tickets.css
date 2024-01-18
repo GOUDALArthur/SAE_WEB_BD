@@ -1,0 +1,34 @@
+/* tickets.css */
+
+/* Style the table */
+#formulaire table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+}
+
+/* Style the table header */
+#formulaire th {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    text-align: left;
+}
+
+/* Style the table cells */
+#formulaire td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+/* Style the table rows */
+#formulaire tr {
+    background-color: #f2f2f2;
+}
+
+
+
+/* Add a subtle transition effect when hovering over rows */
+#formulaire tr {
+    transition: background-color 0.2s;
+}

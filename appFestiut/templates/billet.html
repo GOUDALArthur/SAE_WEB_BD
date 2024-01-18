@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{{ super() }}
 {% block content %}
 <link rel="stylesheet" href="{{url_for('static', filename='billet.css')}}">
     <h1>Acheter un billet</h1>
@@ -7,24 +7,32 @@
 
     <div class="ticket-forms">
         <form action="{{ url_for('confirmation_billet') }}" method="post">
-            <h2>Billet 1 jours</h2>
-            <p>Prix: 50€</p>
-            <input type="hidden" name="ticket_type" value="1">
+            <h2>Billet pour un nombre de jours</h2>
+            <label for="jours">Nombre de jours :</label>
+            
+
+            <input type="number" id="jours" name="jours" min="1" max="10" value="1" onchange="updatePrice()">
+            <input type="hidden" name="ticket_type" value="days">
+            <input type="hidden" id="prix_input" name="prix" value="10">
+            <p id="prix">Prix: 10€</p>
             <input type="submit" value="Acheter">
         </form>
 
         <form action="{{ url_for('confirmation_billet') }}" method="post">
-            <h2>Billet 2 jours</h2>
-            <p>Prix: 100€</p>
-            <input type="hidden" name="ticket_type" value="2">
-            <input type="submit" value="Acheter">
-        </form>
-
-        <form action="{{ url_for('confirmation_billet') }}" method="post">
-            <h2>Billet all </h2>
+            <h2>Billet pour tout le festival</h2>
             <p>Prix: 150€</p>
-            <input type="hidden" name="ticket_type" value="3">
+            <input type="hidden" name="ticket_type" value="all">
             <input type="submit" value="Acheter">
         </form>
     </div>
+
+    <script>
+        function updatePrice() {
+            var jours = document.getElementById('jours').value;
+            var prix = jours * 10;
+            document.getElementById('prix').innerHTML = 'Prix: ' + prix + '€';
+            document.getElementById('prix_input').value = prix;
+        }
+    </script>
 {% endblock %}
+
