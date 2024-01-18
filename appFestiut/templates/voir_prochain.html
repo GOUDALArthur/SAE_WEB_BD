@@ -9,7 +9,7 @@
   <div class="event-container">
     {% for concert in concerts %}
       <div class="event-block">
-        <h3>Concert du groupe {{ get_groupe_by_id(concert.id_gr) }}</h3>
+        <h3>Concert de {{ get_groupe_by_id(concert.id_gr) }}</h3>
         <p>Date de début : {{ concert.date_debut_concert.strftime('%Y-%m-%d %H:%M') }}</p>
         <p>Lieu : {{ get_lieu_by_id(concert.id_lieu) }}</p>
       </div>
