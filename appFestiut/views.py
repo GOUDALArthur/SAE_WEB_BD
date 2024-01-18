@@ -11,6 +11,8 @@ from hashlib import sha256
 from .models import *
 from flask import request, flash
 from datetime import timedelta , datetime
+from sqlalchemy import desc
+
 
 
 
@@ -334,38 +336,47 @@ def add_artist():
     afficher_popup('Artiste ajouté.')
     return render_template('ajoutArtiste.html')
 
-@app.route('/ajout_groupe', methods=['GET','POST'])
-def get_page_groupe():
+
+def get_style():
     styles = StyleMusique.query.all()
-    return render_template('ajoutGroupe.html', styles=styles)
+    for style in styles:
+        type_musique = TypeMusique.query.filter_by(id_type=style.id_type).first()
+        style.type_name = type_musique.type if type_musique else "No type"
+    return styles
+
+@app.route('/ajout_groupe', methods=['GET','POST'])
+def get_page_groupe():   
+    return render_template('ajoutGroupe.html', styles=get_style())
 
     
 @app.route('/add_group', methods=['GET','POST'])
 def add_group():
-        styles = db.session.query(StyleMusique, TypeMusique).join(TypeMusique, StyleMusique.id_type == TypeMusique.id_type).all()
-        group_name = request.form.get('nom_gr')
-        description_gr = request.form.get('description_gr')
-        reseau_gr = request.form.get('reseau_gr')
-        style_id = request.form.getlist('style')
-        print(style_id)
 
-        existing_group = Groupe.query.filter_by(nom_gr=group_name).first()
 
-        if existing_group:
-            afficher_popup('Ce groupe existe déja.')
-            return render_template('ajoutGroupe.html', styles=styles)
 
-        new_group = Groupe(nom_gr=group_name, description_gr=description_gr, reseaux_gr=reseau_gr)
-        
-        db.session.add(new_group)
+
+
+    styles = db.session.query(StyleMusique, TypeMusique).join(TypeMusique, StyleMusique.id_type == TypeMusique.id_type).all()
+    group_name = request.form.get('nom_gr')
+    description_gr = request.form.get('description_gr')
+    reseau_gr = request.form.get('reseau_gr')
+    style_id = request.form.getlist('style')
+    print(style_id)
+
+    existing_group = Groupe.query.filter_by(nom_gr=group_name).first()
+    if existing_group:
+        afficher_popup('Ce groupe existe déja.')
+        return render_template('ajoutGroupe.html', styles=get_style())
+    new_group = Groupe(nom_gr=group_name, description_gr=description_gr, reseaux_gr=reseau_gr)
+    
+    db.session.add(new_group)
+    db.session.commit()
+    for style_ids in style_id:
+        asso_style = GroupeStyleAssociation(id_groupe=new_group.id_gr, id_style=style_ids)
+        db.session.add(asso_style)
         db.session.commit()
-        for style_ids in style_id:
-            asso_style = GroupeStyleAssociation(id_groupe=new_group.id_gr, id_style=style_ids)
-            db.session.add(asso_style)
-            db.session.commit()
-
-        afficher_popup('Groupe ajouté.')
-        return render_template('ajoutGroupe.html', styles=styles)
+    afficher_popup('Groupe ajouté.')
+    return render_template('ajoutGroupe.html', styles=get_style())
 
 
 @app.route('/ajout_activite', methods=['GET','POST'])
@@ -419,6 +430,105 @@ def add_concert():
         if date_debut_concert >= date_fin_concert:
             afficher_popup('La date de début doit être inférieure à la date de fin.')
             return render_template('ajoutConcert.html', lieu=lieu, groupe=groupe)
+                # Vérification si le groupe est disponible pour assurer le concert
+        dernier_concert = (
+            Concert.query
+            .filter(Concert.id_gr == id_gr)
+            .filter(Concert.date_fin_concert <= date_debut_concert)
+            .order_by(Concert.date_fin_concert.desc())
+            .first()
+        )
+        prochain_concert = (
+            Concert.query
+            .filter(Concert.id_gr == id_gr)
+            .filter(Concert.date_debut_concert >= date_fin_concert)
+            .order_by(Concert.date_debut_concert)
+            .first()
+        )
+        derniere_act = (
+            ActiviteAnnexe.query
+            .filter(ActiviteAnnexe.id_gr == id_gr)
+            .filter(ActiviteAnnexe.date_fin_act_ann <= date_debut_concert)
+            .order_by(ActiviteAnnexe.date_fin_act_ann.desc())
+            .first()
+        )
+        prochaine_act = (
+            ActiviteAnnexe.query
+            .filter(ActiviteAnnexe.id_gr == id_gr)
+            .filter(ActiviteAnnexe.date_debut_act_ann >= date_fin_concert)
+            .order_by(ActiviteAnnexe.date_debut_act_ann)
+            .first()
+        )
+
+        if dernier_concert and derniere_act:
+            if dernier_concert.date_fin_concert < derniere_act.date_fin_act_ann:
+                dernier_concert = derniere_act
+        elif derniere_act:
+            dernier_concert = derniere_act
+
+        if prochain_concert and prochaine_act:
+            if prochain_concert.date_debut_concert > prochaine_act.date_debut_act_ann:
+                prochain_concert = prochaine_act
+        elif prochaine_act:
+            prochain_concert = prochaine_act
+
+        if dernier_concert is not None:
+            dernier_trajet = (
+                Deplacer.query
+                .filter(Deplacer.id_lieu_depart == dernier_concert.id_lieu)
+                .filter(Deplacer.id_lieu_arrivee == id_lieu)
+                .first()
+            )
+            if dernier_trajet is None:   
+                dernier_trajet = (
+                    Deplacer.query
+                    .filter(Deplacer.id_lieu_arrivee == dernier_concert.id_lieu)
+                    .filter(Deplacer.id_lieu_depart == id_lieu)
+                    .first()
+                )
+            derniere_dispo = date_debut_concert - timedelta(minutes=dernier_trajet.temps_de_trajet) if dernier_trajet is not None else None
+
+        if prochain_concert is not None:
+            prochain_trajet = (
+                Deplacer.query
+                .filter(Deplacer.id_lieu_depart == prochain_concert.id_lieu)
+                .filter(Deplacer.id_lieu_arrivee == id_lieu)
+                .first()
+            )
+            if prochain_trajet is None:   
+                prochain_trajet = (
+                    Deplacer.query
+                    .filter(Deplacer.id_lieu_arrivee == prochain_concert.id_lieu)
+                    .filter(Deplacer.id_lieu_depart == id_lieu)
+                    .first()
+                )
+            prochaine_dispo = date_fin_concert + timedelta(minutes=prochain_trajet.temps_de_trajet) if prochain_trajet is not None else None
+
+        if dernier_concert is not None and dernier_concert.date_fin_concert >= derniere_dispo or prochain_concert is not None and prochain_concert.date_debut_concert <= prochaine_dispo:
+            afficher_popup("Le groupe n'est pas disponible à ce moment.")
+            return render_template('ajoutConcert.html', lieu=lieu, groupe=groupe)
+
+        # Vérification si le lieu est disponible pour accueillir le concert
+        dernier_concert = (
+            Concert.query
+            .filter(Concert.id_lieu == id_lieu)
+            .filter(Concert.date_fin_concert <= date_debut_concert)
+            .order_by(Concert.date_debut_concert.desc())
+            .first()
+        )
+        prochain_concert = (
+            Concert.query
+            .filter(Concert.id_lieu == id_lieu)
+            .filter(Concert.date_debut_concert >= date_fin_concert)
+            .order_by(Concert.date_debut_concert)
+            .first()
+        )
+
+        derniere_dispo = date_debut_concert - timedelta(minutes=dernier_concert.duree_demontage) - timedelta(minutes=duree_montage) if dernier_concert is not None else None
+        prochaine_dispo = date_fin_concert + timedelta(minutes=prochain_concert.duree_montage) + timedelta(minutes=duree_demontage) if prochain_concert is not None else None
+        if dernier_concert is not None and dernier_concert.date_fin_concert >= derniere_dispo or prochain_concert is not None and prochain_concert.date_debut_concert <= prochaine_dispo:
+            afficher_popup("Le lieu n'est pas disponible à ce moment.")
+            return render_template('ajoutConcert.html', lieu=lieu, groupe=groupe)
 
         new_concert = Concert(date_debut_concert=date_debut_concert, date_fin_concert=date_fin_concert, duree_montage=duree_montage, duree_demontage=duree_demontage, id_gr=id_gr, id_lieu=id_lieu)
         db.session.add(new_concert)
@@ -428,17 +538,13 @@ def add_concert():
         return render_template('ajoutConcert.html', lieu=lieu, groupe=groupe)
 
 
-from datetime import datetime
-from flask import render_template
-from .models import Concert, ActiviteAnnexe
+
+
 
 @app.route('/voir_prochain', methods=['GET','POST'])
 def get_prochain_page():
     concerts = Concert.query.all()
     activities = ActiviteAnnexe.query.all()
-    
-    print(concerts)
-    print(activities)
     return render_template('voir_prochain.html', concerts=concerts, activities=activities)
 
 
@@ -455,4 +561,6 @@ def utility_processor():
         groupe = Groupe.query.get(id_g)
         return groupe.nom_gr if groupe else None
     return dict(get_groupe_by_id=get_groupe_by_id)
+
+
 

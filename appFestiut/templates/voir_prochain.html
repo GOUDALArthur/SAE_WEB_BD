@@ -22,6 +22,7 @@
       <div class="event-block">
         <h3>{{ activity.titre_act_ann }}</h3>
         <p>Date de début : {{ activity.date_debut_act_ann.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p>Groupe : {{ get_groupe_by_id(activity.id_gr) }}</p>
         <p>Lieu : {{ get_lieu_by_id(activity.id_lieu) }}</p>
       </div>
     {% endfor %}

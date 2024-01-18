@@ -26,7 +26,7 @@
                 <a href="{{ url_for('home') }}">Accueil</a>
             </li>
 
-            {% if not current_user.is_authenticated or current_user.id_fest >= 1 %}
+            {% if not current_user.is_authenticated or current_user.id_fest != (0|string) %}
 
             
 
@@ -57,7 +57,7 @@
 
             {% endif %}
 
-            {% if current_user.is_authenticated and current_user.id_fest >= 1  %}
+            {% if current_user.is_authenticated and current_user.id_fest != (0|string)  %}
 
             <li id="connection">
                 <a href ="{{ url_for('get_favorites')}}">Mes favoris</a>
@@ -79,15 +79,11 @@
 
             {% endif %}
 
-            {% if current_user.id_fest == 0 %}
+            {% if current_user.id_fest == (0|string) %}
 
 
             <li id="connection">
                 <a href ="{{ url_for('get_page_artiste')}}">Ajout Artiste</a>
-            </li>
-
-            <li id="connection">
-                <a href ="{{ url_for('logout')}}">Ajout Style</a>
             </li>
 
             <li id="connection">

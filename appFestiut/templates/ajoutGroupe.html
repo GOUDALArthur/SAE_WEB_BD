@@ -18,9 +18,9 @@
 
         <label for="style">Style de musique:</label><br>
         <select id="style" name="style" multiple>
-            {% for style, type in styles %}
-            <option value="{{ style.id_style }}">{{ type.type }} : {{ style.style }} </option>
-            {% endfor %}
+            {% for style in styles %}
+            <option value="{{ style.id_style }}">{{ style.type_name }} : {{ style.style }} </option>
+        {% endfor %}
         </select><br>
 
         <input type="submit" value="Ajouter">
