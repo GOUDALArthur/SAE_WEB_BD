@@ -54,7 +54,7 @@ def syncdb():
     occ1 = Occuper(id_gr=1, id_heberg=1, date_heberg=datetime.now().date())
     db.session.add(occ1)
 
-    concert1 = Concert(id_concert=1, date_debut_concert=datetime.now(), date_fin_concert=datetime.now(), 
+    concert1 = Concert(id_concert=1, date_debut_concert=datetime.now(), date_fin_concert=datetime(year=2024, month=1, day=18, hour=14, minute=30, second=0), 
                        duree_montage=2, duree_demontage=2, id_gr=1, id_lieu=1)
     db.session.add(concert1)
 
