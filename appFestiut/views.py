@@ -412,29 +412,29 @@ def add_concert():
         dernier_concert = (
             Concert.query
             .filter(Concert.id_gr == id_gr)
-            .filter(Concert.date_fin_concert <= date_debut_concert)
-            .order_by(Concert.date_fin_concert.desc())
+            .filter(Concert.date_debut_concert <= date_fin_concert)
+            .order_by(Concert.date_debut_concert.desc())
             .first()
         )
         prochain_concert = (
             Concert.query
             .filter(Concert.id_gr == id_gr)
-            .filter(Concert.date_debut_concert >= date_fin_concert)
-            .order_by(Concert.date_debut_concert)
+            .filter(Concert.date_fin_concert >= date_debut_concert)
+            .order_by(Concert.date_fin_concert)
             .first()
         )
         derniere_act = (
             ActiviteAnnexe.query
             .filter(ActiviteAnnexe.id_gr == id_gr)
-            .filter(ActiviteAnnexe.date_fin_act_ann <= date_debut_concert)
-            .order_by(ActiviteAnnexe.date_fin_act_ann.desc())
+            .filter(ActiviteAnnexe.date_debut_act_ann <= date_debut_concert)
+            .order_by(ActiviteAnnexe.date_debut_act_ann.desc())
             .first()
         )
         prochaine_act = (
             ActiviteAnnexe.query
             .filter(ActiviteAnnexe.id_gr == id_gr)
-            .filter(ActiviteAnnexe.date_debut_act_ann >= date_fin_concert)
-            .order_by(ActiviteAnnexe.date_debut_act_ann)
+            .filter(ActiviteAnnexe.date_fin_act_ann >= date_fin_concert)
+            .order_by(ActiviteAnnexe.date_fin_act_ann)
             .first()
         )
 
@@ -451,20 +451,28 @@ def add_concert():
             prochain_concert = prochaine_act
 
         if dernier_concert is not None:
-            dernier_trajet = (
-                Deplacer.query
-                .filter(Deplacer.id_lieu_depart == dernier_concert.id_lieu)
-                .filter(Deplacer.id_lieu_arrivee == id_lieu)
-                .first()
-            )
-            if dernier_trajet is None:   
+            print(id_lieu, dernier_concert.id_lieu)
+            print(id_lieu == dernier_concert.id_lieu)
+            if int(id_lieu) == dernier_concert.id_lieu:
+                derniere_dispo = date_debut_concert
+            else:
                 dernier_trajet = (
                     Deplacer.query
-                    .filter(Deplacer.id_lieu_arrivee == dernier_concert.id_lieu)
-                    .filter(Deplacer.id_lieu_depart == id_lieu)
+                    .filter(Deplacer.id_lieu_depart == dernier_concert.id_lieu)
+                    .filter(Deplacer.id_lieu_arrivee == id_lieu)
                     .first()
                 )
-            derniere_dispo = date_debut_concert - timedelta(minutes=dernier_trajet.temps_de_trajet) if dernier_trajet is not None else None
+                print(dernier_trajet)
+                if dernier_trajet is None:   
+                    dernier_trajet = (
+                        Deplacer.query
+                        .filter(Deplacer.id_lieu_arrivee == dernier_concert.id_lieu)
+                        .filter(Deplacer.id_lieu_depart == id_lieu)
+                        .first()
+                    )
+                    print(dernier_trajet)
+                derniere_dispo = date_debut_concert - timedelta(minutes=dernier_trajet.temps_de_trajet) if dernier_trajet is not None else None
+            print(derniere_dispo)
 
         if prochain_concert is not None:
             prochain_trajet = (
@@ -490,15 +498,15 @@ def add_concert():
         dernier_concert = (
             Concert.query
             .filter(Concert.id_lieu == id_lieu)
-            .filter(Concert.date_fin_concert <= date_debut_concert)
+            .filter(Concert.date_debut_concert <= date_fin_concert)
             .order_by(Concert.date_debut_concert.desc())
             .first()
         )
         prochain_concert = (
             Concert.query
             .filter(Concert.id_lieu == id_lieu)
-            .filter(Concert.date_debut_concert >= date_fin_concert)
-            .order_by(Concert.date_debut_concert)
+            .filter(Concert.date_fin_concert >= date_debut_concert)
+            .order_by(Concert.date_fin_concert)
             .first()
         )
 
