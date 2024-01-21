@@ -615,3 +615,50 @@ def add_lieu():
 
     afficher_popup("Lieu ajouté avec succès.")
     return render_template('ajoutLieu.html')
+
+
+
+@app.route('/groupes', methods=['GET'])
+def groupes():
+    all_groupes = Groupe.query.all()
+    return render_template('groupes.html', groupes=all_groupes)
+
+
+
+
+
+
+@app.route('/groupe/<int:id>', methods=['GET','POST'])
+def groupe(id):
+    artiste = Artiste.query.filter_by(id_gr=id).all()
+    new_artiste = Artiste.query.filter_by(id_gr=0).all()
+    groupe = Groupe.query.get(id)
+    return render_template('groupe.html', groupe=groupe, artiste=artiste, new_artiste=new_artiste)
+
+
+@app.route('/groupe/<int:id>/ajouter_membre', methods=['POST'])
+def ajouter_membre(id):
+    artiste_id = request.form.get('artiste')
+
+    artiste = Artiste.query.get(artiste_id)
+    if not artiste:
+        afficher_popup("Lieu ajouté avec succès.")
+        return redirect(url_for('groupe', id=id))
+
+    artiste.id_gr = id
+    db.session.commit()
+
+    return redirect(url_for('groupe', id=id))
+
+
+
+@app.route('/groupe/<int:groupe_id>/supprimer_membre/<int:artiste_id>', methods=['GET','POST'])
+def supprimer_membre(groupe_id, artiste_id):
+    artiste = Artiste.query.get(artiste_id)
+    if not artiste or artiste.id_gr != groupe_id:
+        return 'Artiste non trouvé dans ce groupe.', 404
+
+    artiste.id_gr = 0
+    db.session.commit()
+
+    return redirect(url_for('groupe', id=groupe_id))
