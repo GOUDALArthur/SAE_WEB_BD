@@ -11,6 +11,7 @@
       <div class="event-block">
         <h3>Concert de {{ get_groupe_by_id(concert.id_gr) }}</h3>
         <p>Date de début : {{ concert.date_debut_concert.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p>Date de fin : {{ concert.date_fin_concert.strftime('%Y-%m-%d %H:%M') }}</p>
         <p>Lieu : {{ get_lieu_by_id(concert.id_lieu) }}</p>
       </div>
     {% endfor %}
@@ -22,6 +23,7 @@
       <div class="event-block">
         <h3>{{ activity.titre_act_ann }}</h3>
         <p>Date de début : {{ activity.date_debut_act_ann.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p>Date de fin : {{ activity.date_fin_act_ann.strftime('%Y-%m-%d %H:%M') }}</p>
         <p>Groupe : {{ get_groupe_by_id(activity.id_gr) }}</p>
         <p>Lieu : {{ get_lieu_by_id(activity.id_lieu) }}</p>
       </div>
