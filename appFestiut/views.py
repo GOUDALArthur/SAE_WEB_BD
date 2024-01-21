@@ -313,6 +313,15 @@ def add_artist():
     return render_template('ajoutArtiste.html')
 
 
+
+
+
+
+
+def get_artiste():
+    artistes = Artiste.query.filter_by(id_gr=0).all()
+    return artistes
+
 def get_style():
     styles = StyleMusique.query.all()
     for style in styles:
@@ -320,39 +329,63 @@ def get_style():
         style.type_name = type_musique.type if type_musique else "No type"
     return styles
 
+
+
+
+
+
+
+
+
+
 @app.route('/ajout_groupe', methods=['GET','POST'])
 def get_page_groupe():   
-    return render_template('ajoutGroupe.html', styles=get_style())
+    return render_template('ajoutGroupe.html', styles=get_style(), artistes = get_artiste())
 
     
 @app.route('/add_group', methods=['GET','POST'])
 def add_group():
-
-
-
-
-
-    styles = db.session.query(StyleMusique, TypeMusique).join(TypeMusique, StyleMusique.id_type == TypeMusique.id_type).all()
     group_name = request.form.get('nom_gr')
     description_gr = request.form.get('description_gr')
     reseau_gr = request.form.get('reseau_gr')
     style_id = request.form.getlist('style')
-    print(style_id)
+    artiste_ids = request.form.getlist('artiste')
 
     existing_group = Groupe.query.filter_by(nom_gr=group_name).first()
     if existing_group:
         afficher_popup('Ce groupe existe déja.')
-        return render_template('ajoutGroupe.html', styles=get_style())
+        return render_template('ajoutGroupe.html', styles=get_style(), artistes = get_artiste())
     new_group = Groupe(nom_gr=group_name, description_gr=description_gr, reseaux_gr=reseau_gr)
     
     db.session.add(new_group)
     db.session.commit()
+
+    for artist_id in artiste_ids:
+        artist = Artiste.query.get(artist_id)
+        if artist:
+            artist.id_gr = new_group.id_gr
+    db.session.commit()
+
     for style_ids in style_id:
         asso_style = GroupeStyleAssociation(id_groupe=new_group.id_gr, id_style=style_ids)
         db.session.add(asso_style)
         db.session.commit()
     afficher_popup('Groupe ajouté.')
-    return render_template('ajoutGroupe.html', styles=get_style())
+    return render_template('ajoutGroupe.html', styles=get_style(), artistes=get_artiste())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @app.route('/ajout_activite', methods=['GET','POST'])
@@ -552,3 +585,80 @@ def utility_processor():
 
 
 
+
+@app.route('/groups')
+def get_all_groups():
+    groups = Groupe.query.all()
+    return jsonify([group.to_dict() for group in groups])
+
+
+
+@app.route('/ajoute_lieu', methods=['GET','POST'])
+def get_lieu():
+    return render_template('ajoutLieu.html')
+
+
+
+@app.route('/add_lieu', methods=['POST'])
+def add_lieu():
+    lieu_name = request.form.get('lieu')
+    capacite = request.form.get('capacite_lieu')
+
+    existing_lieu = Lieu.query.filter_by(lieu=lieu_name).first()
+    if existing_lieu:
+        afficher_popup("Ce lieu existe déjà.")
+        return render_template('ajoutLieu.html')
+
+    new_lieu = Lieu(lieu=lieu_name, capacite_lieu=capacite)
+    db.session.add(new_lieu)
+    db.session.commit()
+
+    afficher_popup("Lieu ajouté avec succès.")
+    return render_template('ajoutLieu.html')
+
+
+
+@app.route('/groupes', methods=['GET'])
+def groupes():
+    all_groupes = Groupe.query.all()
+    return render_template('groupes.html', groupes=all_groupes)
+
+
+
+
+
+
+@app.route('/groupe/<int:id>', methods=['GET','POST'])
+def groupe(id):
+    artiste = Artiste.query.filter_by(id_gr=id).all()
+    new_artiste = Artiste.query.filter_by(id_gr=0).all()
+    groupe = Groupe.query.get(id)
+    return render_template('groupe.html', groupe=groupe, artiste=artiste, new_artiste=new_artiste)
+
+
+@app.route('/groupe/<int:id>/ajouter_membre', methods=['POST'])
+def ajouter_membre(id):
+    artiste_id = request.form.get('artiste')
+
+    artiste = Artiste.query.get(artiste_id)
+    if not artiste:
+        afficher_popup("Lieu ajouté avec succès.")
+        return redirect(url_for('groupe', id=id))
+
+    artiste.id_gr = id
+    db.session.commit()
+
+    return redirect(url_for('groupe', id=id))
+
+
+
+@app.route('/groupe/<int:groupe_id>/supprimer_membre/<int:artiste_id>', methods=['GET','POST'])
+def supprimer_membre(groupe_id, artiste_id):
+    artiste = Artiste.query.get(artiste_id)
+    if not artiste or artiste.id_gr != groupe_id:
+        return 'Artiste non trouvé dans ce groupe.', 404
+
+    artiste.id_gr = 0
+    db.session.commit()
+
+    return redirect(url_for('groupe', id=groupe_id))

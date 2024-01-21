@@ -23,6 +23,13 @@
         {% endfor %}
         </select><br>
 
+        <label for="artiste">Artiste:</label><br>
+        <select id="artiste" name="artiste" multiple>
+            {% for artiste in artistes %}
+            <option value="{{ artiste.id_art }}">{{ artiste.nom_art }} </option>
+        {% endfor %}
+        </select><br>
+
         <input type="submit" value="Ajouter">
     </form>
 </div>

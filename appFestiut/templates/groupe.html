@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{url_for('static', filename='groupe.css')}}">
+{% endblock %}
+{% block content %}
+<div class="content">
+    <h1>{{ groupe.nom_gr }}</h1>
+    <h2>Membres</h2>
+    <ul>
+        {% for artiste in artiste %}
+            <li>
+                {{ artiste.nom_art }}
+                <a class="form-link" href="{{ url_for('supprimer_membre', groupe_id=groupe.id_gr, artiste_id=artiste.id_art) }}">Supprimer</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <form action="{{ url_for('ajouter_membre', id=groupe.id_gr) }}" method="post">
+        <label for="artiste">Artiste:</label><br>
+        <select id="artiste" name="artiste" multiple>
+            {% for artiste in new_artiste %}
+            <option value="{{ artiste.id_art }}">{{ artiste.nom_art }} </option>
+            {% endfor %}
+        </select><br>
+        <input type="submit" value="Ajouter Artiste">
+    </form>
+
+
+</div>
+{% endblock %}
+
+

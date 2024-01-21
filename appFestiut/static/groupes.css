@@ -1,0 +1,27 @@
+.content {
+    width: 80%;
+    margin: auto;
+    text-align: center;
+}
+
+.groupes-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.groupe-item {
+    width: 200px;
+    height: 200px;
+    border: 1px solid #000;
+    margin: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+}
+
+.groupe-item a {
+    text-decoration: none;
+    color: #000;
+}
